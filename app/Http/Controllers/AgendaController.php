@@ -108,11 +108,27 @@ class AgendaController extends Controller
                          ->with('success', 'Agenda berhasil dihapus!');
     }
 
+    // Tambahkan function ini di dalam AgendaController
     public function dashboard()
     {
-        // Ambil data untuk halaman depan (Pegawai)
-        $agendas = Agenda::latest()->get();
-        return view('welcome', compact('agendas'));
+        // 1. Hitung-hitungan Data
+        $totalAgenda = Agenda::count();
+        $agendaHariIni = Agenda::whereDate('start_time', date('Y-m-d'))->count();
+        $agendaBulanIni = Agenda::whereMonth('start_time', date('m'))
+                                ->whereYear('start_time', date('Y'))
+                                ->count();
+        $agendaAkanDatang = Agenda::where('start_time', '>', now())->count();
+
+        // 2. Ambil 5 Agenda Terbaru (untuk tabel)
+        $latestAgendas = Agenda::orderBy('created_at', 'desc')->take(5)->get();
+
+        return view('dashboard', compact(
+            'totalAgenda', 
+            'agendaHariIni', 
+            'agendaBulanIni', 
+            'agendaAkanDatang',
+            'latestAgendas'
+        ));
     }
 
     // Fungsi khusus untuk memberikan data ke Kalender
