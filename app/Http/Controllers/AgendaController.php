@@ -7,137 +7,28 @@ use App\Models\Agenda;
 
 class AgendaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // --- 1. HALAMAN DEPAN (Pegawai/Umum) ---
+    // Fungsi ini sebelumnya TIDAK ADA di file kamu
+    public function welcome()
+    {
+        return view('welcome');
+    }
+
+    // --- 2. ADMIN: LIST AGENDA (Index) ---
     public function index()
     {
-        // Ambil semua data agenda, urutkan dari yang terbaru
         $agendas = Agenda::latest()->get();
-
-        // Kirim data ($agendas) ke view
         return view('agenda.index', compact('agendas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('agenda.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // 1. Validasi data (Cek apakah isian sudah benar)
-        $request->validate([
-            'title' => 'required',
-            'location' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
-    ]);
-
-        // 2. Simpan ke Database
-        Agenda::create($request->all());
-
-        // 3. Kembali ke halaman utama dengan pesan sukses
-        return redirect()->route('agenda.index')
-                        ->with('success', 'Agenda berhasil disimpan!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        // 1. Ambil data agenda yang mau diedit
-        $agenda = Agenda::findOrFail($id);
-
-        // 2. Tampilkan form edit sambil membawa data tadi
-        return view('agenda.edit', compact('agenda'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-            // 1. Validasi inputan
-        $request->validate([
-            'title' => 'required',
-            'location' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
-        ]);
-
-        // 2. Cari data yang mau diupdate
-        $agenda = Agenda::findOrFail($id);
-
-        // 3. Simpan perubahan
-        $agenda->update($request->all());
-
-        // 4. Kembali ke halaman utama
-        return redirect()->route('agenda.index')
-                        ->with('success', 'Agenda berhasil diperbarui!');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        // 1. Cari data berdasarkan ID
-        $agenda = Agenda::findOrFail($id);
-
-        // 2. Hapus data
-        $agenda->delete();
-
-        // 3. Kembali ke halaman utama
-        return redirect()->route('agenda.index')
-                         ->with('success', 'Agenda berhasil dihapus!');
-    }
-
-    // Tambahkan function ini di dalam AgendaController
-    public function dashboard()
-    {
-        // 1. Hitung-hitungan Data
-        $totalAgenda = Agenda::count();
-        $agendaHariIni = Agenda::whereDate('start_time', date('Y-m-d'))->count();
-        $agendaBulanIni = Agenda::whereMonth('start_time', date('m'))
-                                ->whereYear('start_time', date('Y'))
-                                ->count();
-        $agendaAkanDatang = Agenda::where('start_time', '>', now())->count();
-
-        // 2. Ambil 5 Agenda Terbaru (untuk tabel)
-        $latestAgendas = Agenda::orderBy('created_at', 'desc')->take(5)->get();
-
-        return view('dashboard', compact(
-            'totalAgenda', 
-            'agendaHariIni', 
-            'agendaBulanIni', 
-            'agendaAkanDatang',
-            'latestAgendas'
-        ));
-    }
-
-    // Fungsi khusus untuk memberikan data ke Kalender
+    // --- 3. DATA FEED (API Kalender) ---
     public function feed()
     {
         $agendas = Agenda::all();
         $events = [];
 
         foreach ($agendas as $agenda) {
+            // Logika pewarnaan selang-seling (Genap: Biru, Ganjil: Hijau)
             $isGenap = $agenda->id % 2 == 0;
             
             $events[] = [
@@ -147,16 +38,133 @@ class AgendaController extends Controller
                 'end'   => $agenda->end_time,
                 'extendedProps' => [
                     'location' => $agenda->location,
-                    'description' => $agenda->description
+                    'description' => $agenda->description,
+                    // Tambahkan 2 baris ini agar data baru terbaca di Frontend
+                    'participants' => $agenda->participants,
+                    'is_whatsapp_notify' => $agenda->is_whatsapp_notify
                 ],
-                // WARNA PASTEL PERSIS PROTOTYPE
-                'backgroundColor' => $isGenap ? '#cfe2ff' : '#d1e7dd', // Biru Muda / Hijau Muda
+                'backgroundColor' => $isGenap ? '#cfe2ff' : '#d1e7dd', 
                 'borderColor'     => $isGenap ? '#cfe2ff' : '#d1e7dd', 
-                'textColor'       => $isGenap ? '#084298' : '#0f5132', // Teks Biru Tua / Hijau Tua
+                'textColor'       => $isGenap ? '#084298' : '#0f5132',
                 'allDay'          => false 
             ];
         }
 
         return response()->json($events);
     }
-}
+
+    // --- 4. DASHBOARD ADMIN ---
+    public function dashboard()
+    {
+        // FIX: Pakai waktu Asia/Jakarta (WIB) agar akurat
+        $now = \Carbon\Carbon::now('Asia/Jakarta');
+        
+        // 1. Agenda Hari Ini (Total agenda yang tanggalnya HARI INI)
+        $agendaHariIni = Agenda::whereDate('start_time', $now->toDateString())->count();
+
+        // 2. Agenda Bulan Ini (Total agenda di BULAN INI)
+        $agendaBulanIni = Agenda::whereMonth('start_time', $now->month)
+                                ->whereYear('start_time', $now->year)
+                                ->count();
+
+        // 3. Akan Datang
+        // Logika: Hitung agenda yang Waktu Mulainya LEBIH BESAR dari Waktu Sekarang (WIB)
+        // Jadi kalau sekarang jam 08.00, agenda jam 07.15 tidak akan dihitung lagi.
+        $agendaAkanDatang = Agenda::where('start_time', '>', $now->toDateTimeString())->count();
+
+        // 4. Total Arsip (Agenda yang SUDAH LEWAT)
+        $totalAgenda = Agenda::where('start_time', '<', $now->toDateTimeString())->count();
+
+        // 5. Tabel Agenda Baru Ditambahkan (Inputan Hari Ini)
+        $latestAgendas = Agenda::whereDate('created_at', $now->toDateString())
+                                ->latest()
+                                ->get();
+
+        return view('dashboard', compact(
+            'agendaHariIni', 
+            'agendaBulanIni', 
+            'agendaAkanDatang', 
+            'totalAgenda', 
+            'latestAgendas'
+        ));
+    }
+
+    // --- 5. CRUD: CREATE ---
+    public function create()
+    {
+        return view('agenda.create');
+    }
+
+    // --- 6. CRUD: STORE ---
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required',
+            'date' => 'required|date',
+            'start_hour' => 'required',
+            'location' => 'required',
+            'participants' => 'required|array', // Ubah jadi array
+        ]);
+
+        // ... SISA KODE SAMA (logika gabung tanggal) ...
+        $start_datetime = $request->date . ' ' . $request->start_hour;
+        $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour : null;
+
+        Agenda::create([
+            'title' => $request->title,
+            'start_time' => $start_datetime,
+            'end_time' => $end_datetime,
+            'location' => $request->location,
+            'participants' => $request->participants, // Laravel otomatis ubah array ke JSON
+            'description' => $request->description,
+            'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
+        ]);
+
+        return redirect()->back()->with('success', 'Agenda berhasil dijadwalkan!');
+    }
+
+    // --- 7. CRUD: EDIT ---
+    public function edit($id)
+    {
+        $agenda = Agenda::findOrFail($id);
+        return view('agenda.edit', compact('agenda'));
+    }
+
+    // --- 8. CRUD: UPDATE ---
+    public function update(Request $request, Agenda $agenda)
+    {
+        $request->validate([
+            'title' => 'required',
+            'date' => 'required|date',
+            'start_hour' => 'required',
+            'location' => 'required',
+            'participants' => 'required|array', // Ubah jadi array
+        ]);
+
+        // ... SISA KODE SAMA ...
+        $start_datetime = $request->date . ' ' . $request->start_hour;
+        $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour : null;
+
+        $agenda->update([
+            'title' => $request->title,
+            'start_time' => $start_datetime,
+            'end_time' => $end_datetime,
+            'location' => $request->location,
+            'participants' => $request->participants,
+            'description' => $request->description,
+            'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
+        ]);
+
+        return redirect()->back()->with('success', 'Agenda berhasil diperbarui!');
+    }
+
+    // --- 9. CRUD: DESTROY ---
+    public function destroy($id)
+    {
+        $agenda = Agenda::findOrFail($id);
+        $agenda->delete();
+
+        return redirect()->route('agenda.index')->with('success', 'Agenda berhasil dihapus!');
+    }
+} 
+// HANYA ADA SATU KURUNG TUTUP DI SINI (SUDAH BENAR)

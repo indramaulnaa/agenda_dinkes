@@ -12,10 +12,16 @@ class Agenda extends Model
     // Izinkan kolom-kolom ini diisi data
     protected $fillable = [
         'title',
-        'description',
-        'location',
         'start_time',
         'end_time',
-        'is_reminder_sent'
+        'location',
+        'participants',       // <--- Baru
+        'description',
+        'is_whatsapp_notify'  // <--- Baru
+    ];
+
+    protected $casts = [
+        'participants' => 'array', // Agar otomatis jadi Array saat diambil
+        'is_whatsapp_notify' => 'boolean',
     ];
 }
