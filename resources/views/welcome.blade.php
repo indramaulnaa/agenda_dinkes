@@ -13,10 +13,29 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        /* --- BACKGROUND IMAGE DENGAN OVERLAY --- */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            
+            /* 1. Ganti URL ini dengan foto gedung kantor Anda nanti */
+            background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 2. Lapisan Putih Transparan (Agar teks tetap terbaca jelas) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(248, 249, 250, 0.1); /* Putih 90% Opacity */
+            z-index: -1; /* Taruh di belakang konten */
+            backdrop-filter: blur(2px); /* Efek blur dikit biar estetik */
+        }
         
         /* Navbar Style */
-        .navbar { background: white; border-bottom: 1px solid #eaeaea; padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .navbar { background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid #eaeaea; padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); backdrop-filter: blur(5px); }
         .brand-logo { width: 40px; height: 40px; background: #198754; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 12px;}
         .brand-text h5 { font-weight: 700; margin: 0; color: #111827; font-size: 1.1rem; }
         .brand-text p { margin: 0; font-size: 0.8rem; color: #6b7280; }
@@ -37,76 +56,44 @@
         /* Angka Tanggal */
         .fc-daygrid-day-number { color: #374151 !important; text-decoration: none !important; font-weight: 500; margin: 4px; padding: 4px 8px; }
         
-        /* Hari Ini (Background Putih - Text Hitam Bold) */
+        /* Hari Ini */
         .fc-day-today { background: none !important; background-color: transparent !important; }
-        .fc-day-today .fc-daygrid-day-number { 
-            background-color: transparent !important; 
-            color: #111827 !important; 
-            font-weight: 800 !important;
-        }
+        .fc-day-today .fc-daygrid-day-number { background-color: transparent !important; color: #111827 !important; font-weight: 800 !important; }
         
-        /* --- STYLE KHUSUS LIST VIEW (TRANSFORMASI KE KARTU) --- */
+        /* --- STYLE KHUSUS LIST VIEW --- */
         .fc-theme-standard .fc-list { border: none !important; }
         .fc-theme-standard .fc-list-day-cushion { background-color: transparent !important; border: none !important; padding: 15px 0 10px 0 !important; }
         .fc-list-event td { border: none !important; background: transparent !important; }
         .fc-list-event:hover td { background: transparent !important; }
         
-        /* Judul Tanggal - HILANGKAN GARIS BAWAH */
-        .fc-list-day-text, .fc-list-day-side-text { 
-            font-size: 1.1rem; font-weight: 700; color: #111827; 
-            text-decoration: none !important; /* Hapus Garis Bawah */
-        }
-        .fc-list-day-cushion a { 
-            text-decoration: none !important; /* Hapus Garis Bawah Link */
-            pointer-events: none; /* Matikan klik pada tanggal */
-            color: inherit !important;
-        }
+        /* Judul Tanggal */
+        .fc-list-day-text, .fc-list-day-side-text { font-size: 1.1rem; font-weight: 700; color: #111827; text-decoration: none !important; }
+        .fc-list-day-cushion a { text-decoration: none !important; pointer-events: none; color: inherit !important; }
         
-        /* Sembunyikan Elemen Bawaan */
         .fc-list-event-title { padding: 0 !important; border: none !important; }
         .fc-list-event-time, .fc-list-event-graphic { display: none !important; }
         .fc-list-empty { display: none !important; }
 
         /* DESAIN KARTU AGENDA */
         .agenda-list-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            transition: all 0.2s ease-in-out;
-            cursor: pointer; 
+            background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;
+            margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s ease-in-out; cursor: pointer; 
         }
-        .agenda-list-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-            border-color: #198754;
-        }
+        .agenda-list-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: #198754; }
 
-        /* --- UPDATE WARNA STATUS BADGE (SESUAI REQUEST) --- */
-        .card-status-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        /* Sedang Berlangsung -> Kuning */
+        /* WARNA STATUS */
+        .card-status-badge { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px; }
         .bg-ongoing { background-color: #fff3cd; color: #664d03; } 
-        /* Akan Datang -> Biru */
         .bg-scheduled { background-color: #cfe2ff; color: #084298; } 
-        /* Selesai -> Hijau */
         .bg-selesai { background-color: #d1e7dd; color: #0f5132; } 
 
-        /* Typography Kartu */
         .card-time { font-size: 1rem; font-weight: 800; color: #111827; margin-bottom: 4px; }
         .card-title { font-size: 1.1rem; font-weight: 600; color: #374151; margin-bottom: 8px; line-height: 1.4; }
         .card-location { font-size: 0.9rem; color: #6b7280; display: flex; align-items: center; gap: 6px; }
         .card-participants { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e5e7eb; font-size: 0.85rem; color: #6b7280; }
 
-        /* Style Grid */
+        /* Grid Style */
         .fc-daygrid-event { border: none !important; padding: 4px 8px !important; border-radius: 6px; margin-top: 4px !important; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: none !important; }
         .fc-daygrid-event:hover { opacity: 1 !important; filter: none !important; }
         .event-time-text { font-weight: 900 !important; margin-right: 6px; }
@@ -117,21 +104,9 @@
         .detail-content { font-size: 1rem; color: #111827; font-weight: 500; margin-bottom: 16px; }
         .badge-participant { background-color: #e0f2fe; color: #0369a1; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; display: inline-block; border: 1px solid #bae6fd; margin-right: 4px; margin-bottom: 4px;}
 
-        /* TOMBOL TUTUP CUSTOM (GELAP -> HITAM PEKAT) */
-        .btn-close-custom {
-            background-color: #4b5563;
-            border: none;
-            color: white;
-            font-weight: 700;
-            padding: 10px;
-            transition: all 0.3s ease;
-        }
-        .btn-close-custom:hover {
-            background-color: #000000 !important;
-            color: white !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+        /* Tombol Tutup Custom */
+        .btn-close-custom { background-color: #4b5563; border: none; color: white; font-weight: 700; padding: 10px; transition: all 0.3s ease; }
+        .btn-close-custom:hover { background-color: #000000 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -160,14 +135,14 @@
     <div class="container" style="margin-top: 100px;">
         <div class="text-center mb-4">
             <h2 class="fw-bold text-dark">Jadwal Kegiatan</h2>
-            <p class="text-muted">Agenda resmi kegiatan Dinas Kesehatan bulan ini</p>
+            <p class="text-secondary fw-medium">Agenda resmi kegiatan Dinas Kesehatan bulan ini</p>
         </div>
 
         <div class="calendar-container">
             <div id='calendar'></div>
         </div>
         
-        <div class="text-center text-muted mb-5">
+        <div class="text-center text-secondary fw-medium mb-5">
             <small>&copy; {{ date('Y') }} Dinas Kesehatan. All rights reserved.</small>
         </div>
     </div>
@@ -220,7 +195,7 @@
                     center: '',
                     right: 'dayGridMonth,listMonth prev,today,next' 
                 },
-                buttonText: { today: 'Hari Ini', month: 'Kalender', list: 'List Agenda' },
+                buttonText: { today: 'Hari Ini', month: 'Bulan', list: 'List' },
                 events: '{{ route("agenda.feed") }}', 
 
                 datesSet: function(info) {
@@ -254,25 +229,16 @@
                     let start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                     
                     if (arg.view.type === 'listMonth') {
-                        // --- TAMPILAN KARTU (CARD VIEW) ---
                         let end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                         let timeRange = end ? `${start} - ${end}` : start;
                         
                         let now = new Date();
                         let eventEnd = event.end || event.start;
                         
-                        // --- LOGIKA STATUS & WARNA BARU ---
-                        let badgeLabel = 'Akan Datang'; // Default (Scheduled)
-                        let badgeClass = 'bg-scheduled'; // Default Biru
+                        let badgeLabel = 'Akan Datang'; let badgeClass = 'bg-scheduled';
 
-                        if (now > eventEnd) { 
-                            badgeLabel = 'Selesai'; 
-                            badgeClass = 'bg-selesai'; // Hijau
-                        } 
-                        else if (now >= event.start && now <= eventEnd) { 
-                            badgeLabel = 'Sedang Berlangsung'; 
-                            badgeClass = 'bg-ongoing'; // Kuning
-                        }
+                        if (now > eventEnd) { badgeLabel = 'Selesai'; badgeClass = 'bg-selesai'; } 
+                        else if (now >= event.start && now <= eventEnd) { badgeLabel = 'Sedang Berlangsung'; badgeClass = 'bg-ongoing'; }
 
                         let pData = event.extendedProps.participants;
                         let pText = Array.isArray(pData) ? pData.join(', ') : pData;
@@ -298,7 +264,6 @@
                         return { domNodes: [card] };
 
                     } else {
-                        // --- TAMPILAN GRID (BALOK) ---
                         let content = document.createElement('div');
                         content.style.backgroundColor = event.backgroundColor;
                         content.style.borderColor = event.borderColor;
