@@ -34,25 +34,16 @@
         .fc .fc-button-primary:hover { background-color: #f3f4f6 !important; color: #111827 !important; }
         .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active { background-color: transparent !important; color: #111827 !important; font-weight: 800 !important; }
 
-        /* --- STYLE KHUSUS LIST VIEW (CARD LOOK - UPDATED) --- */
+        /* --- STYLE KHUSUS LIST VIEW (CARD LOOK) --- */
         .fc-theme-standard .fc-list { border: none !important; }
         .fc-theme-standard .fc-list-day-cushion { background-color: transparent !important; border: none !important; padding: 15px 0 10px 0 !important; }
         .fc-list-event td { border: none !important; background: transparent !important; }
         .fc-list-event:hover td { background: transparent !important; }
-        
-        /* Judul Tanggal - HAPUS GARIS BAWAH */
-        .fc-list-day-text, .fc-list-day-side-text { 
-            font-size: 1.1rem; font-weight: 700; color: #111827; 
-            text-decoration: none !important; 
-        }
-        .fc-list-day-cushion a { 
-            text-decoration: none !important; 
-            pointer-events: none; 
-            color: inherit !important;
-        }
-
+        .fc-list-day-text, .fc-list-day-side-text { font-size: 1.1rem; font-weight: 700; color: #111827; text-decoration: none !important; }
+        .fc-list-day-cushion a { text-decoration: none !important; pointer-events: none; color: inherit !important; }
         .fc-list-event-title { padding: 0 !important; border: none !important; }
         .fc-list-event-time, .fc-list-event-graphic { display: none !important; }
+        .fc-list-empty { display: none !important; }
 
         /* DESAIN KARTU AGENDA */
         .agenda-list-card {
@@ -62,14 +53,10 @@
         }
         .agenda-list-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: #198754; }
 
-        /* --- UPDATE WARNA STATUS BADGE (SAMA DENGAN PEGAWAI) --- */
+        /* STATUS BADGE */
         .card-status-badge { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        /* Sedang Berlangsung -> Kuning */
         .bg-ongoing { background-color: #fff3cd; color: #664d03; } 
-        /* Akan Datang -> Biru */
         .bg-scheduled { background-color: #cfe2ff; color: #084298; } 
-        /* Selesai -> Hijau */
         .bg-selesai { background-color: #d1e7dd; color: #0f5132; } 
 
         .card-time { font-size: 1rem; font-weight: 800; color: #111827; margin-bottom: 4px; }
@@ -82,27 +69,17 @@
         .fc-daygrid-event:hover { opacity: 1 !important; filter: none !important; }
         .event-time-text { font-weight: 900 !important; margin-right: 6px; }
 
-        /* STYLE MODAL & FORM */
+        /* HELPERS */
         .form-label-bold { font-weight: 600; font-size: 0.9rem; color: #374151; }
         .wa-toggle-card { background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; display: flex; align-items: center; justify-content: space-between;}
-        
         .btn-custom-green { background-color: #198754; border: none; color: white; font-weight: 600; padding: 10px 20px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; }
         .btn-custom-green:hover { background-color: #157347; color: white; }
         .btn-outline-custom { background: white; border: 1px solid #d1d5db; color: #374151; font-weight: 500; padding: 10px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;}
         .btn-outline-custom:hover { background-color: #f3f4f6; color: #111827; }
         
-        .fc-list-empty { display: none !important; }
-        .fc-list-day-cushion { background-color: #f8f9fa !important; }
-
-        /* SELECT2 STYLING */
         .select2-container .select2-selection--multiple { min-height: 38px; border: 1px solid #ced4da; border-radius: 0.375rem; }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice { 
-            background-color: #198754 !important; border: 1px solid #146c43 !important; color: white !important;
-            font-size: 0.85rem; margin-top: 6px; padding-left: 5px; display: inline-flex; align-items: center;
-        }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { 
-            color: white !important; border-right: 1px solid #146c43 !important; margin-right: 12px; padding-right: 5px;
-        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice { background-color: #198754 !important; border: 1px solid #146c43 !important; color: white !important; font-size: 0.85rem; margin-top: 6px; padding-left: 5px; display: inline-flex; align-items: center; }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: white !important; border-right: 1px solid #146c43 !important; margin-right: 12px; padding-right: 5px; }
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #146c43 !important; color: white !important; }
     </style>
 
@@ -118,6 +95,13 @@
     @if(session('success'))
         <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4">
             <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -153,12 +137,17 @@
 
                     <div class="p-3 bg-light rounded text-secondary mb-3" id="detailDesc"></div>
 
+                    <div id="notOwnerAlert" class="alert alert-warning border-0 small mb-0" style="display:none;">
+                        <i class="bi bi-lock-fill"></i> Anda hanya bisa melihat agenda ini (Dibuat oleh admin lain).
+                    </div>
+
                     <div id="detailWaActive" class="text-success small fw-bold mb-3" style="display:none;">
                         <i class="bi bi-whatsapp"></i> Notifikasi WhatsApp Aktif
                     </div>
 
                     <hr>
-                    <div class="d-flex gap-2">
+                    
+                    <div id="actionButtons" class="d-flex gap-2" style="display: none;">
                         <button id="btnOpenEdit" class="btn btn-warning text-white flex-grow-1">
                             <i class="bi bi-pencil-square"></i> Edit
                         </button>
@@ -308,7 +297,6 @@
         </div>
     </div>
 
-
     <script>
         $(document).ready(function() {
             $('.select2-create').select2({ dropdownParent: $('#createModal'), placeholder: "Pilih peserta", allowClear: true });
@@ -322,23 +310,20 @@
                 initialView: 'dayGridMonth',
                 locale: 'id',
                 headerToolbar: { left: 'title', center: '', right: 'dayGridMonth,listMonth prev,today,next' },
-                buttonText: { today: 'Hari Ini', month: 'Kalender', list: 'List Agenda' },
-                events: '{{ route("agenda.feed") }}',
+                buttonText: { today: 'Hari Ini', month: 'Bulan', list: 'List Agenda' },
+                
+                // FILTER: HANYA GENERAL
+                events: '{{ route("agenda.feed") }}?type=general',
 
                 datesSet: function(info) {
                     if (info.view.type === 'listMonth') {
                         var now = new Date(); now.setHours(0,0,0,0);
                         var todayStr = now.toISOString().split('T')[0];
-
                         document.querySelectorAll('.fc-list-day').forEach(function(header) {
                             var dateStr = header.getAttribute('data-date');
                             if (dateStr) {
                                 var headerDate = new Date(dateStr); headerDate.setHours(0,0,0,0);
-                                
-                                // Sembunyikan masa lalu
                                 if (headerDate < now) { header.style.display = 'none'; }
-                                
-                                // Ubah judul Hari Ini
                                 if (dateStr === todayStr) {
                                     var titleEl = header.querySelector('.fc-list-day-text');
                                     if(titleEl) { titleEl.innerText = "Hari Ini"; titleEl.style.color = "#198754"; }
@@ -360,23 +345,14 @@
                     let start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
 
                     if (arg.view.type === 'listMonth') {
-                        // --- LOGIKA STATUS DAN WARNA (SAMA DENGAN PEGAWAI) ---
                         let end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                         let timeRange = end ? `${start} - ${end}` : start;
-                        
                         let now = new Date();
                         let eventEnd = event.end || event.start;
-                        
-                        let badgeLabel = 'Akan Datang'; // Default
-                        let badgeClass = 'bg-scheduled'; // Default Biru
+                        let badgeLabel = 'Akan Datang'; let badgeClass = 'bg-scheduled';
 
-                        if (now > eventEnd) { 
-                            badgeLabel = 'Selesai'; 
-                            badgeClass = 'bg-selesai'; // Hijau
-                        } else if (now >= event.start && now <= eventEnd) { 
-                            badgeLabel = 'Sedang Berlangsung'; 
-                            badgeClass = 'bg-ongoing'; // Kuning
-                        }
+                        if (now > eventEnd) { badgeLabel = 'Selesai'; badgeClass = 'bg-selesai'; } 
+                        else if (now >= event.start && now <= eventEnd) { badgeLabel = 'Sedang Berlangsung'; badgeClass = 'bg-ongoing'; }
 
                         let pData = event.extendedProps.participants;
                         let pText = Array.isArray(pData) ? pData.join(', ') : pData;
@@ -386,23 +362,14 @@
                         card.className = 'agenda-list-card';
                         card.innerHTML = `
                             <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="card-time">${timeRange}</div>
-                                    <div class="card-title">${event.title}</div>
-                                </div>
+                                <div><div class="card-time">${timeRange}</div><div class="card-title">${event.title}</div></div>
                                 <span class="card-status-badge ${badgeClass}">${badgeLabel}</span>
                             </div>
-                            <div class="card-location">
-                                <i class="bi bi-geo-alt-fill me-2 text-muted"></i> ${event.extendedProps.location || 'Lokasi tidak tersedia'}
-                            </div>
-                            <div class="card-participants">
-                                <i class="bi bi-people-fill me-1"></i> ${pText}
-                            </div>
+                            <div class="card-location"><i class="bi bi-geo-alt-fill me-2 text-muted"></i> ${event.extendedProps.location || '-'}</div>
+                            <div class="card-participants"><i class="bi bi-people-fill me-1"></i> ${pText}</div>
                         `;
                         return { domNodes: [card] };
-
                     } else {
-                        // Tampilan Grid (Balok)
                         let content = document.createElement('div');
                         content.style.backgroundColor = event.backgroundColor;
                         content.style.borderColor = event.borderColor;
@@ -417,9 +384,11 @@
                     }
                 },
 
+                // --- LOGIKA KLIK & CEK KEPEMILIKAN ---
                 eventClick: function(info) {
                     var event = info.event;
                     var props = event.extendedProps;
+                    
                     document.getElementById('detailTitle').innerText = event.title;
                     document.getElementById('detailLocation').innerText = props.location || '-';
                     document.getElementById('detailDesc').innerText = props.description || 'Tidak ada deskripsi.';
@@ -427,54 +396,67 @@
                     var wrapper = document.getElementById('detailParticipantsWrapper');
                     wrapper.innerHTML = ''; 
                     var pData = props.participants;
-                    if(Array.isArray(pData)) {
-                        pData.forEach(p => { let b = document.createElement('span'); b.className='badge bg-light text-dark border me-1'; b.innerText=p; wrapper.appendChild(b); });
-                    } else if (pData) {
-                        let b = document.createElement('span'); b.className='badge bg-light text-dark border'; b.innerText=pData; wrapper.appendChild(b);
-                    } else { wrapper.innerText = '-'; }
+                    if(Array.isArray(pData)) { pData.forEach(p => { let b = document.createElement('span'); b.className='badge bg-light text-dark border me-1'; b.innerText=p; wrapper.appendChild(b); }); } 
+                    else if (pData) { let b = document.createElement('span'); b.className='badge bg-light text-dark border'; b.innerText=pData; wrapper.appendChild(b); } 
+                    else { wrapper.innerText = '-'; }
 
                     var start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                     var end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                     document.getElementById('detailTime').innerText = event.start.toLocaleDateString('id-ID', { dateStyle: 'full' }) + ' • ' + start + (end ? ' - ' + end : '');
                     document.getElementById('detailWaActive').style.display = (props.is_whatsapp_notify == 1) ? 'block' : 'none';
 
+                    // === 2. SET URL DELETE (PENTING: Di luar IF) ===
                     var baseUrl = "{{ url('/agenda') }}"; 
                     document.getElementById('formDelete').action = baseUrl + "/" + event.id;
 
-                    document.getElementById('btnOpenEdit').onclick = function() {
-                        var detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
-                        detailModal.hide();
-                        document.getElementById('formEditAgenda').action = baseUrl + "/" + event.id;
-                        document.getElementById('editTitle').value = event.title;
-                        document.getElementById('editLocation').value = props.location;
-                        document.getElementById('editDescription').value = props.description;
-                        $('#editParticipants').val(props.participants).trigger('change');
+                    // === 3. CEK KEPEMILIKAN ===
+                    var actionButtons = document.getElementById('actionButtons');
+                    var notOwnerAlert = document.getElementById('notOwnerAlert');
 
-                        var year = event.start.getFullYear();
-                        var month = String(event.start.getMonth() + 1).padStart(2, '0');
-                        var day = String(event.start.getDate()).padStart(2, '0');
-                        document.getElementById('editDate').value = `${year}-${month}-${day}`;
+                    if (props.can_edit) {
+                        // Jika MILIK SENDIRI -> Tampilkan Tombol
+                        actionButtons.style.display = 'flex';
+                        notOwnerAlert.style.display = 'none';
+                        
+                        document.getElementById('btnOpenEdit').onclick = function() {
+                            var detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                            detailModal.hide();
+                            document.getElementById('formEditAgenda').action = baseUrl + "/" + event.id;
+                            document.getElementById('editTitle').value = event.title;
+                            document.getElementById('editLocation').value = props.location;
+                            document.getElementById('editDescription').value = props.description;
+                            $('#editParticipants').val(props.participants).trigger('change');
 
-                        var startHour = String(event.start.getHours()).padStart(2, '0');
-                        var startMin = String(event.start.getMinutes()).padStart(2, '0');
-                        var timeStr = `${startHour}:${startMin}`;
-                        document.getElementById('editStart').value = timeStr;
-                        if(document.getElementById('editStart')._flatpickr) document.getElementById('editStart')._flatpickr.setDate(timeStr);
+                            var year = event.start.getFullYear();
+                            var month = String(event.start.getMonth() + 1).padStart(2, '0');
+                            var day = String(event.start.getDate()).padStart(2, '0');
+                            document.getElementById('editDate').value = `${year}-${month}-${day}`;
 
-                        if(event.end) {
-                            var endHour = String(event.end.getHours()).padStart(2, '0');
-                            var endMin = String(event.end.getMinutes()).padStart(2, '0');
-                            var endStr = `${endHour}:${endMin}`;
-                            document.getElementById('editEnd').value = endStr;
-                            if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.setDate(endStr);
-                        } else {
-                            document.getElementById('editEnd').value = '';
-                            if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.clear();
-                        }
-                        document.getElementById('editWa').checked = (props.is_whatsapp_notify == 1);
-                        var editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                        editModal.show();
-                    };
+                            var startHour = String(event.start.getHours()).padStart(2, '0');
+                            var startMin = String(event.start.getMinutes()).padStart(2, '0');
+                            var timeStr = `${startHour}:${startMin}`;
+                            document.getElementById('editStart').value = timeStr;
+                            if(document.getElementById('editStart')._flatpickr) document.getElementById('editStart')._flatpickr.setDate(timeStr);
+
+                            if(event.end) {
+                                var endHour = String(event.end.getHours()).padStart(2, '0');
+                                var endMin = String(event.end.getMinutes()).padStart(2, '0');
+                                var endStr = `${endHour}:${endMin}`;
+                                document.getElementById('editEnd').value = endStr;
+                                if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.setDate(endStr);
+                            } else {
+                                document.getElementById('editEnd').value = '';
+                                if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.clear();
+                            }
+                            document.getElementById('editWa').checked = (props.is_whatsapp_notify == 1);
+                            new bootstrap.Modal(document.getElementById('editModal')).show();
+                        };
+                    } else {
+                        // Jika BUKAN MILIK SENDIRI -> Sembunyikan Tombol
+                        actionButtons.style.display = 'none';
+                        notOwnerAlert.style.display = 'block';
+                    }
+
                     new bootstrap.Modal(document.getElementById('detailModal')).show();
                 }
             });

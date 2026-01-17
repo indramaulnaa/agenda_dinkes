@@ -19,6 +19,7 @@
             min-width: 260px; max-width: 260px; background: #ffffff; color: #333;
             min-height: 100vh; border-right: 1px solid #eaeaea; padding: 20px;
             position: fixed; height: 100%; overflow-y: auto; z-index: 100;
+            display: flex; flex-direction: column; /* Agar footer bisa di bawah */
         }
         
         #content {
@@ -36,7 +37,7 @@
         .brand-text h5 { margin: 0; font-weight: 700; font-size: 1rem; color: #111827; }
         .brand-text p { margin: 0; font-size: 0.75rem; color: #6b7280; }
 
-        .sidebar-menu { list-style: none; padding: 0; margin-top: 20px; }
+        .sidebar-menu { list-style: none; padding: 0; margin-top: 20px; flex-grow: 1; }
         .sidebar-menu li { margin-bottom: 8px; }
         .sidebar-menu a {
             display: flex; align-items: center; gap: 12px; padding: 12px 16px;
@@ -49,13 +50,29 @@
             background-color: #198754; color: white; box-shadow: 0 4px 6px rgba(25, 135, 84, 0.15);
         }
 
+        /* User Profile & Logout Area */
+        .sidebar-footer {
+            margin-top: auto; /* Dorong ke paling bawah */
+            border-top: 1px solid #f0f0f0;
+            padding-top: 20px;
+        }
+
         .user-profile {
-            position: absolute; bottom: 20px; left: 20px; right: 20px;
-            display: flex; align-items: center; gap: 10px; padding-top: 20px; border-top: 1px solid #f0f0f0;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 15px;
         }
         .avatar {
             width: 36px; height: 36px; background: #e5e7eb; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 700; color: #374151;
+        }
+
+        /* Tombol Logout Style */
+        .btn-logout {
+            width: 100%; text-align: left; display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; border-radius: 8px; color: #dc3545; font-weight: 600;
+            background: #fff5f5; border: 1px solid #fed7d7; transition: 0.2s;
+        }
+        .btn-logout:hover {
+            background: #dc3545; color: white; border-color: #dc3545;
         }
 
         /* --- HEADER --- */
@@ -118,6 +135,11 @@
                 </a>
             </li>
             <li>
+            <a href="{{ route('meeting-room.index') }}" class="{{ request()->is('meeting-room*') ? 'active' : '' }}">
+                <i class="bi bi-door-open-fill"></i> Meeting Room
+            </a>
+            </li>
+            <li>
                 <a href="{{ route('staff.index') }}" class="{{ request()->routeIs('staff.*') ? 'active' : '' }}">
                     <i class="bi bi-people"></i> Staff Data
                 </a>
@@ -129,14 +151,24 @@
             </li>
         </ul>
 
-        <div class="user-profile">
-            <div class="avatar">AD</div>
-            <div>
-                <div style="font-weight: 600; font-size: 0.9rem;">Admin User</div>
-                <div style="font-size: 0.75rem; color: #6b7280;">admin@dinkes.go.id</div>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar">AD</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">Admin User</div>
+                    <div style="font-size: 0.75rem; color: #6b7280;">admin@dinkes.go.id</div>
+                </div>
             </div>
+            
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-logout" onclick="return confirm('Yakin ingin keluar?')">
+                    <i class="bi bi-box-arrow-right"></i> Keluar
+                </button>
+            </form>
         </div>
     </nav>
+
     <div id="content">
         
         <div class="main-header">

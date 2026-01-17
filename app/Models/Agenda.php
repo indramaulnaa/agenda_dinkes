@@ -2,26 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Agenda extends Model
 {
-    use HasFactory;
-
-    // Izinkan kolom-kolom ini diisi data
+    // Tambahkan semua kolom yang boleh diisi ke sini
     protected $fillable = [
+        'user_id',            // <--- PENTING: Untuk menyimpan ID pembuat
+        'type',               // <--- PENTING: Untuk membedakan general/meeting_room
         'title',
         'start_time',
         'end_time',
-        'location',
-        'participants',       // <--- Baru
+        'location',           // <--- INI YANG MENYEBABKAN ERROR SEBELUMNYA
         'description',
-        'is_whatsapp_notify'  // <--- Baru
+        'participants',
+        'is_whatsapp_notify'
     ];
 
     protected $casts = [
-        'participants' => 'array', // Agar otomatis jadi Array saat diambil
+        'participants' => 'array',
         'is_whatsapp_notify' => 'boolean',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
+
+    // Relasi ke User (Admin yang membuat)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -2,100 +2,68 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Agenda;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http; // WAJIB ADA: Untuk kirim WA
 
 class AgendaController extends Controller
 {
-    // --- 1. HALAMAN DEPAN (Pegawai/Umum) ---
-    // Fungsi ini sebelumnya TIDAK ADA di file kamu
-    public function welcome()
+    public function dashboard()
     {
-        return view('welcome');
+        $totalAgenda = Agenda::count();
+        $agendaToday = Agenda::whereDate('start_time', date('Y-m-d'))->count();
+        $upcomingAgenda = Agenda::where('start_time', '>', now())->count();
+        $recentAgendas = Agenda::orderBy('created_at', 'desc')->take(5)->get();
+
+        return view('dashboard', compact('totalAgenda', 'agendaToday', 'upcomingAgenda', 'recentAgendas'));
     }
 
-    // --- 2. ADMIN: LIST AGENDA (Index) ---
     public function index()
     {
-        $agendas = Agenda::latest()->get();
-        return view('agenda.index', compact('agendas'));
+        return view('agenda.index');
     }
 
-    // --- 3. DATA FEED (API Kalender) ---
-    public function feed()
+    public function feed(Request $request)
     {
-        $agendas = Agenda::all();
-        $events = [];
+        $query = Agenda::query();
 
-        foreach ($agendas as $agenda) {
-            // Logika pewarnaan selang-seling (Genap: Biru, Ganjil: Hijau)
-            $isGenap = $agenda->id % 2 == 0;
-            
-            $events[] = [
-                'id' => $agenda->id,
-                'title' => $agenda->title,
-                'start' => $agenda->start_time,
-                'end'   => $agenda->end_time,
-                'extendedProps' => [
-                    'location' => $agenda->location,
-                    'description' => $agenda->description,
-                    // Tambahkan 2 baris ini agar data baru terbaca di Frontend
-                    'participants' => $agenda->participants,
-                    'is_whatsapp_notify' => $agenda->is_whatsapp_notify
-                ],
-                'backgroundColor' => $isGenap ? '#cfe2ff' : '#d1e7dd', 
-                'borderColor'     => $isGenap ? '#cfe2ff' : '#d1e7dd', 
-                'textColor'       => $isGenap ? '#084298' : '#0f5132',
-                'allDay'          => false 
-            ];
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
         }
+
+        $agendas = $query->get();
+        
+        $events = $agendas->map(function ($agenda) {
+            $color = $agenda->type == 'meeting_room' ? '#dc3545' : '#198754';
+            $isOwner = $agenda->user_id == Auth::id(); 
+
+            // Logika Privasi (Jika Anda pakai fitur private)
+            $title = $agenda->title;
+            if ($agenda->is_secret && !Auth::check()) { $title = "🔒 Agenda Tertutup"; }
+
+            return [
+                'id' => $agenda->id,
+                'title' => $title,
+                'start' => $agenda->start_time->format('Y-m-d H:i:s'), // Fix Timezone
+                'end' => $agenda->end_time ? $agenda->end_time->format('Y-m-d H:i:s') : null,
+                'location' => $agenda->location,
+                'description' => $agenda->description,
+                'participants' => $agenda->participants,
+                'is_whatsapp_notify' => $agenda->is_whatsapp_notify,
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'textColor' => '#ffffff',
+                'extendedProps' => [
+                    'can_edit' => $isOwner,
+                    'creator_name' => $agenda->user ? $agenda->user->name : 'Unknown'
+                ]
+            ];
+        });
 
         return response()->json($events);
     }
 
-    // --- 4. DASHBOARD ADMIN ---
-    public function dashboard()
-    {
-        // FIX: Pakai waktu Asia/Jakarta (WIB) agar akurat
-        $now = \Carbon\Carbon::now('Asia/Jakarta');
-        
-        // 1. Agenda Hari Ini (Total agenda yang tanggalnya HARI INI)
-        $agendaHariIni = Agenda::whereDate('start_time', $now->toDateString())->count();
-
-        // 2. Agenda Bulan Ini (Total agenda di BULAN INI)
-        $agendaBulanIni = Agenda::whereMonth('start_time', $now->month)
-                                ->whereYear('start_time', $now->year)
-                                ->count();
-
-        // 3. Akan Datang
-        // Logika: Hitung agenda yang Waktu Mulainya LEBIH BESAR dari Waktu Sekarang (WIB)
-        // Jadi kalau sekarang jam 08.00, agenda jam 07.15 tidak akan dihitung lagi.
-        $agendaAkanDatang = Agenda::where('start_time', '>', $now->toDateTimeString())->count();
-
-        // 4. Total Arsip (Agenda yang SUDAH LEWAT)
-        $totalAgenda = Agenda::where('start_time', '<', $now->toDateTimeString())->count();
-
-        // 5. Tabel Agenda Baru Ditambahkan (Inputan Hari Ini)
-        $latestAgendas = Agenda::whereDate('created_at', $now->toDateString())
-                                ->latest()
-                                ->get();
-
-        return view('dashboard', compact(
-            'agendaHariIni', 
-            'agendaBulanIni', 
-            'agendaAkanDatang', 
-            'totalAgenda', 
-            'latestAgendas'
-        ));
-    }
-
-    // --- 5. CRUD: CREATE ---
-    public function create()
-    {
-        return view('agenda.create');
-    }
-
-    // --- 6. CRUD: STORE ---
     public function store(Request $request)
     {
         $request->validate([
@@ -103,68 +71,138 @@ class AgendaController extends Controller
             'date' => 'required|date',
             'start_hour' => 'required',
             'location' => 'required',
-            'participants' => 'required|array', // Ubah jadi array
         ]);
 
-        // ... SISA KODE SAMA (logika gabung tanggal) ...
-        $start_datetime = $request->date . ' ' . $request->start_hour;
-        $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour : null;
+        $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
+        $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
 
-        Agenda::create([
+        // Cek Bentrok
+        if ($end_datetime) {
+            $conflicting = Agenda::where('location', $request->location)
+                ->where(function ($query) use ($start_datetime, $end_datetime) {
+                    $query->where('start_time', '<', $end_datetime)
+                          ->where('end_time', '>', $start_datetime);
+                })->first();
+
+            if ($conflicting) {
+                $booker = $conflicting->user ? $conflicting->user->name : 'Admin lain';
+                return redirect()->back()->with('error', "Gagal! Lokasi ini sedang dipakai oleh {$booker}.");
+            }
+        }
+
+        $agenda = Agenda::create([
+            'user_id' => Auth::id(),
+            'type' => 'general',
             'title' => $request->title,
             'start_time' => $start_datetime,
             'end_time' => $end_datetime,
             'location' => $request->location,
-            'participants' => $request->participants, // Laravel otomatis ubah array ke JSON
+            'participants' => $request->participants ?? [],
             'description' => $request->description,
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
+            'is_secret' => $request->has('is_secret') ? true : false,
         ]);
 
-        return redirect()->back()->with('success', 'Agenda berhasil dijadwalkan!');
+        // --- KIRIM WHATSAPP ---
+        if ($agenda->is_whatsapp_notify) {
+            $this->sendWhatsappNotification($agenda);
+        }
+
+        return redirect()->route('agenda.index')->with('success', 'Agenda berhasil ditambahkan');
     }
 
-    // --- 7. CRUD: EDIT ---
-    public function edit($id)
+    public function update(Request $request, string $id)
     {
         $agenda = Agenda::findOrFail($id);
-        return view('agenda.edit', compact('agenda'));
-    }
 
-    // --- 8. CRUD: UPDATE ---
-    public function update(Request $request, Agenda $agenda)
-    {
+        if ($agenda->user_id != Auth::id()) {
+            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk mengubah agenda ini karena dibuat oleh admin lain.');
+        }
+
         $request->validate([
             'title' => 'required',
             'date' => 'required|date',
             'start_hour' => 'required',
             'location' => 'required',
-            'participants' => 'required|array', // Ubah jadi array
         ]);
 
-        // ... SISA KODE SAMA ...
-        $start_datetime = $request->date . ' ' . $request->start_hour;
-        $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour : null;
+        $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
+        $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
+
+        if ($end_datetime) {
+            $conflicting = Agenda::where('location', $request->location)
+                ->where('id', '!=', $id)
+                ->where(function ($query) use ($start_datetime, $end_datetime) {
+                    $query->where('start_time', '<', $end_datetime)
+                          ->where('end_time', '>', $start_datetime);
+                })->first();
+
+            if ($conflicting) {
+                $booker = $conflicting->user ? $conflicting->user->name : 'Admin lain';
+                return redirect()->back()->with('error', "Gagal Update! Lokasi bentrok dengan {$booker}.");
+            }
+        }
 
         $agenda->update([
             'title' => $request->title,
             'start_time' => $start_datetime,
             'end_time' => $end_datetime,
             'location' => $request->location,
-            'participants' => $request->participants,
+            'participants' => $request->participants ?? [],
             'description' => $request->description,
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
+            'is_secret' => $request->has('is_secret') ? true : false,
         ]);
 
-        return redirect()->back()->with('success', 'Agenda berhasil diperbarui!');
+        return redirect()->route('agenda.index')->with('success', 'Agenda berhasil diperbarui');
     }
 
-    // --- 9. CRUD: DESTROY ---
-    public function destroy($id)
+    public function destroy(string $id)
     {
         $agenda = Agenda::findOrFail($id);
+
+        if ($agenda->user_id != Auth::id()) {
+            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk menghapus agenda ini karena dibuat oleh admin lain.');
+        }
+
         $agenda->delete();
 
-        return redirect()->route('agenda.index')->with('success', 'Agenda berhasil dihapus!');
+        return redirect()->back()->with('success', 'Agenda berhasil dihapus');
     }
-} 
-// HANYA ADA SATU KURUNG TUTUP DI SINI (SUDAH BENAR)
+
+    // --- FUNGSI KIRIM WA KHUSUS AGENDA ---
+    private function sendWhatsappNotification($agenda)
+    {
+        try {
+            $token = env('FONNTE_TOKEN');
+            $target = env('FONNTE_TARGET_GROUP'); 
+
+            $hari = $agenda->start_time->isoFormat('dddd, D MMMM Y');
+            $jam = $agenda->start_time->format('H:i') . ' WIB';
+            if ($agenda->end_time) {
+                $jam .= ' s/d ' . $agenda->end_time->format('H:i') . ' WIB';
+            }
+
+            $message = "*AGENDA BARU DINAS KESEHATAN* 📢\n\n"
+                . "📌 *Kegiatan:* {$agenda->title}\n"
+                . "📅 *Hari/Tgl:* {$hari}\n"
+                . "⏰ *Pukul:* {$jam}\n"
+                . "📍 *Lokasi:* {$agenda->location}\n"
+                . "👥 *Peserta:* " . implode(', ', $agenda->participants ?? ['-']) . "\n\n"
+                . "📝 *Catatan:* " . ($agenda->description ?? '-') . "\n\n"
+                . "_Pesan otomatis Sistem Agenda_";
+
+            Http::withHeaders(['Authorization' => $token])
+                ->post('https://api.fonnte.com/send', [
+                    'target' => $target,
+                    'message' => $message,
+                ]);
+        } catch (\Exception $e) {
+            // Silent Fail (Lanjut terus meski WA gagal)
+        }
+    }
+
+    public function welcome() {
+        return view('welcome');
+    }
+}

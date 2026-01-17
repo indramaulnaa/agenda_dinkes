@@ -3,23 +3,42 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Akun Admin Sekretariat (Bisa dianggap Super Admin atau Admin Utama)
+        User::create([
+            'name' => 'Admin Sekretariat',
+            'email' => 'sekretariat@dinkes.go.id',
+            'password' => Hash::make('password123'), // Password sama semua biar mudah diingat
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // 2. Akun Admin Bidang Kesmas
+        User::create([
+            'name' => 'Admin Kesmas',
+            'email' => 'kesmas@dinkes.go.id',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // 3. Akun Admin Bidang P2P
+        User::create([
+            'name' => 'Admin P2P',
+            'email' => 'p2p@dinkes.go.id',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // 4. Akun Admin Yankes
+        User::create([
+            'name' => 'Admin Yankes',
+            'email' => 'yankes@dinkes.go.id',
+            'password' => Hash::make('password123'),
         ]);
     }
 }
