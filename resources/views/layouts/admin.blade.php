@@ -19,7 +19,7 @@
             min-width: 260px; max-width: 260px; background: #ffffff; color: #333;
             min-height: 100vh; border-right: 1px solid #eaeaea; padding: 20px;
             position: fixed; height: 100%; overflow-y: auto; z-index: 100;
-            display: flex; flex-direction: column; /* Agar footer bisa di bawah */
+            display: flex; flex-direction: column; 
         }
         
         #content {
@@ -45,14 +45,12 @@
         }
         .sidebar-menu a:hover { background-color: #f3f4f6; color: #111827; }
         
-        /* Menu Aktif Hijau */
         .sidebar-menu a.active {
             background-color: #198754; color: white; box-shadow: 0 4px 6px rgba(25, 135, 84, 0.15);
         }
 
-        /* User Profile & Logout Area */
         .sidebar-footer {
-            margin-top: auto; /* Dorong ke paling bawah */
+            margin-top: auto; 
             border-top: 1px solid #f0f0f0;
             padding-top: 20px;
         }
@@ -65,7 +63,6 @@
             display: flex; align-items: center; justify-content: center; font-weight: 700; color: #374151;
         }
 
-        /* Tombol Logout Style */
         .btn-logout {
             width: 100%; text-align: left; display: flex; align-items: center; gap: 10px;
             padding: 10px 16px; border-radius: 8px; color: #dc3545; font-weight: 600;
@@ -84,7 +81,6 @@
 
         .content-section { padding: 30px 40px; }
         
-        /* Kita tetap simpan style table/card disini agar halaman lain bisa pakai */
         .stat-card {
             background: white; padding: 25px; border-radius: 12px; border: 1px solid #eaeaea;
             box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 20px;
@@ -149,14 +145,27 @@
                     <i class="bi bi-gear"></i> Settings
                 </a>
             </li>
+
+            @if(Auth::check() && Auth::user()->role === 'super_admin')
+                <li class="mt-4 mb-2 ps-3 text-uppercase fw-bold text-muted small">Super Admin</li>
+                <li>
+                    <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <i class="bi bi-person-gear"></i> Manajemen User
+                    </a>
+                </li>
+            @endif
         </ul>
 
         <div class="sidebar-footer">
             <div class="user-profile">
-                <div class="avatar">AD</div>
+                <div class="avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
                 <div>
-                    <div style="font-weight: 600; font-size: 0.9rem;">Admin User</div>
-                    <div style="font-size: 0.75rem; color: #6b7280;">admin@dinkes.go.id</div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">
+                        {{ \Illuminate\Support\Str::limit(Auth::user()->name, 15) }}
+                    </div>
+                    <div style="font-size: 0.75rem; color: #6b7280;">
+                        {{ \Illuminate\Support\Str::limit(Auth::user()->email, 20) }}
+                    </div>
                 </div>
             </div>
             

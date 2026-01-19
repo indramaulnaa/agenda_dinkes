@@ -61,15 +61,16 @@ class MeetingRoomController extends Controller
         return redirect()->back()->with('success', 'Booking berhasil dibuat!');
     }
 
-    // --- FUNGSI BARU UNTUK UPDATE ---
     public function update(Request $request, string $id)
     {
         $agenda = Agenda::findOrFail($id);
 
-        // 1. Cek Kepemilikan
-        if ($agenda->user_id != Auth::id()) {
+        // --- UPDATE LOGIKA SECURITY (SUPER ADMIN) ---
+        // Jika User BUKAN Pemilik DAN User BUKAN Super Admin -> Tendang
+        if ($agenda->user_id != Auth::id() && Auth::user()->role !== 'super_admin') {
             return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk mengubah booking ini.');
         }
+        // --------------------------------------------
 
         // 2. Validasi
         $request->validate([
@@ -89,7 +90,7 @@ class MeetingRoomController extends Controller
 
         // 3. CEK BENTROK (KECUALI DIRI SENDIRI)
         $conflictingAgenda = Agenda::where('location', $request->location)
-            ->where('id', '!=', $id) // <--- PENTING: Abaikan data ini sendiri
+            ->where('id', '!=', $id) // Abaikan data ini sendiri
             ->where(function ($query) use ($start_datetime, $end_datetime) {
                 $query->where('start_time', '<', $end_datetime)
                       ->where('end_time', '>', $start_datetime);

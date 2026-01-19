@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Agenda;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http; // WAJIB ADA: Untuk kirim WA
 
 class AgendaController extends Controller
 {
@@ -36,16 +35,18 @@ class AgendaController extends Controller
         
         $events = $agendas->map(function ($agenda) {
             $color = $agenda->type == 'meeting_room' ? '#dc3545' : '#198754';
-            $isOwner = $agenda->user_id == Auth::id(); 
-
-            // Logika Privasi (Jika Anda pakai fitur private)
-            $title = $agenda->title;
-            if ($agenda->is_secret && !Auth::check()) { $title = "🔒 Agenda Tertutup"; }
+            
+            // --- LOGIKA SUPER ADMIN DI SINI ---
+            $isOwner = $agenda->user_id == Auth::id();
+            $isSuperAdmin = Auth::user()->role === 'super_admin'; // Cek role user
+            
+            // User boleh edit jika dia Pemilik ATAU Super Admin
+            $canEdit = $isOwner || $isSuperAdmin; 
 
             return [
                 'id' => $agenda->id,
-                'title' => $title,
-                'start' => $agenda->start_time->format('Y-m-d H:i:s'), // Fix Timezone
+                'title' => $agenda->title,
+                'start' => $agenda->start_time->format('Y-m-d H:i:s'),
                 'end' => $agenda->end_time ? $agenda->end_time->format('Y-m-d H:i:s') : null,
                 'location' => $agenda->location,
                 'description' => $agenda->description,
@@ -55,7 +56,7 @@ class AgendaController extends Controller
                 'borderColor' => $color,
                 'textColor' => '#ffffff',
                 'extendedProps' => [
-                    'can_edit' => $isOwner,
+                    'can_edit' => $canEdit, // Kirim status izin ke frontend
                     'creator_name' => $agenda->user ? $agenda->user->name : 'Unknown'
                 ]
             ];
@@ -90,7 +91,7 @@ class AgendaController extends Controller
             }
         }
 
-        $agenda = Agenda::create([
+        Agenda::create([
             'user_id' => Auth::id(),
             'type' => 'general',
             'title' => $request->title,
@@ -100,13 +101,7 @@ class AgendaController extends Controller
             'participants' => $request->participants ?? [],
             'description' => $request->description,
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
-            'is_secret' => $request->has('is_secret') ? true : false,
         ]);
-
-        // --- KIRIM WHATSAPP ---
-        if ($agenda->is_whatsapp_notify) {
-            $this->sendWhatsappNotification($agenda);
-        }
 
         return redirect()->route('agenda.index')->with('success', 'Agenda berhasil ditambahkan');
     }
@@ -115,9 +110,12 @@ class AgendaController extends Controller
     {
         $agenda = Agenda::findOrFail($id);
 
-        if ($agenda->user_id != Auth::id()) {
-            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk mengubah agenda ini karena dibuat oleh admin lain.');
+        // --- UPDATE LOGIKA SECURITY (SUPER ADMIN) ---
+        // Jika User BUKAN Pemilik DAN User BUKAN Super Admin -> Tendang
+        if ($agenda->user_id != Auth::id() && Auth::user()->role !== 'super_admin') {
+            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk mengubah agenda ini.');
         }
+        // --------------------------------------------
 
         $request->validate([
             'title' => 'required',
@@ -129,6 +127,7 @@ class AgendaController extends Controller
         $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
         $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
 
+        // Cek Bentrok (Kecuali Punya Sendiri)
         if ($end_datetime) {
             $conflicting = Agenda::where('location', $request->location)
                 ->where('id', '!=', $id)
@@ -151,7 +150,7 @@ class AgendaController extends Controller
             'participants' => $request->participants ?? [],
             'description' => $request->description,
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
-            'is_secret' => $request->has('is_secret') ? true : false,
+            'notification_sent' => false, // Reset agar notifikasi dikirim ulang jika jadwal berubah
         ]);
 
         return redirect()->route('agenda.index')->with('success', 'Agenda berhasil diperbarui');
@@ -161,45 +160,16 @@ class AgendaController extends Controller
     {
         $agenda = Agenda::findOrFail($id);
 
-        if ($agenda->user_id != Auth::id()) {
-            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk menghapus agenda ini karena dibuat oleh admin lain.');
+        // --- UPDATE LOGIKA SECURITY (SUPER ADMIN) ---
+        // Jika User BUKAN Pemilik DAN User BUKAN Super Admin -> Tendang
+        if ($agenda->user_id != Auth::id() && Auth::user()->role !== 'super_admin') {
+            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk menghapus agenda ini.');
         }
+        // --------------------------------------------
 
         $agenda->delete();
 
         return redirect()->back()->with('success', 'Agenda berhasil dihapus');
-    }
-
-    // --- FUNGSI KIRIM WA KHUSUS AGENDA ---
-    private function sendWhatsappNotification($agenda)
-    {
-        try {
-            $token = env('FONNTE_TOKEN');
-            $target = env('FONNTE_TARGET_GROUP'); 
-
-            $hari = $agenda->start_time->isoFormat('dddd, D MMMM Y');
-            $jam = $agenda->start_time->format('H:i') . ' WIB';
-            if ($agenda->end_time) {
-                $jam .= ' s/d ' . $agenda->end_time->format('H:i') . ' WIB';
-            }
-
-            $message = "*AGENDA BARU DINAS KESEHATAN* 📢\n\n"
-                . "📌 *Kegiatan:* {$agenda->title}\n"
-                . "📅 *Hari/Tgl:* {$hari}\n"
-                . "⏰ *Pukul:* {$jam}\n"
-                . "📍 *Lokasi:* {$agenda->location}\n"
-                . "👥 *Peserta:* " . implode(', ', $agenda->participants ?? ['-']) . "\n\n"
-                . "📝 *Catatan:* " . ($agenda->description ?? '-') . "\n\n"
-                . "_Pesan otomatis Sistem Agenda_";
-
-            Http::withHeaders(['Authorization' => $token])
-                ->post('https://api.fonnte.com/send', [
-                    'target' => $target,
-                    'message' => $message,
-                ]);
-        } catch (\Exception $e) {
-            // Silent Fail (Lanjut terus meski WA gagal)
-        }
     }
 
     public function welcome() {

@@ -2,31 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Agenda extends Model
 {
-    // Tambahkan semua kolom yang boleh diisi ke sini
+    use HasFactory;
+
     protected $fillable = [
-        'user_id',            // <--- PENTING: Untuk menyimpan ID pembuat
-        'type',               // <--- PENTING: Untuk membedakan general/meeting_room
+        'user_id',
+        'type',                 // 'general' atau 'meeting_room'
         'title',
         'start_time',
         'end_time',
-        'location',           // <--- INI YANG MENYEBABKAN ERROR SEBELUMNYA
-        'description',
+        'location',
         'participants',
-        'is_whatsapp_notify'
+        'description',
+        'is_whatsapp_notify',
+        'notification_sent',    // <--- WAJIB ADA: Agar sistem bisa update status terkirim
     ];
 
     protected $casts = [
-        'participants' => 'array',
-        'is_whatsapp_notify' => 'boolean',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'participants' => 'array',
+        'is_whatsapp_notify' => 'boolean',
+        'notification_sent' => 'boolean', // <--- WAJIB ADA
     ];
 
-    // Relasi ke User (Admin yang membuat)
+    // Relasi ke User (Pembuat Agenda)
     public function user()
     {
         return $this->belongsTo(User::class);
