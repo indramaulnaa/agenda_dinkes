@@ -52,12 +52,20 @@
                 <div class="modal-header border-bottom-0 pb-0"><h5 class="modal-title fw-bold">Detail Booking</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <h4 id="detailTitle" class="fw-bold text-danger mb-3"></h4>
+                    
+                    <div class="d-flex align-items-center mb-2 text-secondary">
+                        <i class="bi bi-person-badge me-2 fs-5"></i> 
+                        <span id="detailCreator"></span>
+                    </div>
+
                     <div class="d-flex align-items-center mb-2 text-muted"><i class="bi bi-clock me-2 fs-5"></i> <span id="detailTime"></span></div>
                     <div class="d-flex align-items-center mb-2 text-muted"><i class="bi bi-geo-alt me-2 fs-5"></i> <span id="detailLocation"></span></div>
                     <div class="mb-3"><div class="d-flex align-items-center mb-2 text-muted"><i class="bi bi-people me-2 fs-5"></i> Divisi/Peserta:</div><div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-1"></div></div>
                     <div class="p-3 bg-light rounded text-secondary mb-3" id="detailDesc"></div>
                     
-                    <div id="notOwnerAlert" class="alert alert-warning border-0 small mb-0" style="display:none;"><i class="bi bi-lock-fill"></i> Booking ini dibuat oleh admin lain.</div>
+                    <div id="notOwnerAlert" class="alert alert-warning border-0 small mb-0" style="display:none;">
+                        </div>
+
                     <hr>
                     <div id="actionButtons" class="d-flex gap-2" style="display: none;">
                         <button id="btnOpenEdit" class="btn btn-warning text-white flex-grow-1"><i class="bi bi-pencil-square"></i> Edit</button>
@@ -170,6 +178,11 @@
                     document.getElementById('detailTitle').innerText = event.title;
                     document.getElementById('detailLocation').innerText = props.location || '-';
                     document.getElementById('detailDesc').innerText = props.description || 'Tidak ada catatan.';
+                    
+                    // --- 1. Tampilkan Info Pembuat ---
+                    var creatorName = props.creator_name || 'Admin lain';
+                    document.getElementById('detailCreator').innerHTML = 'Dibuat oleh: <strong>' + creatorName + '</strong>';
+
                     var wrapper = document.getElementById('detailParticipantsWrapper'); wrapper.innerHTML = ''; 
                     var pData = props.participants; if(Array.isArray(pData)) { pData.forEach(p => { let b = document.createElement('span'); b.className='badge bg-light text-dark border me-1'; b.innerText=p; wrapper.appendChild(b); }); } else if (pData) { let b = document.createElement('span'); b.className='badge bg-light text-dark border'; b.innerText=pData; wrapper.appendChild(b); } else { wrapper.innerText = '-'; }
 
@@ -227,6 +240,8 @@
                     } else {
                         actionButtons.style.display = 'none';
                         notOwnerAlert.style.display = 'block';
+                        // --- 2. Update Teks Alert Sesuai Pembuat ---
+                        notOwnerAlert.innerHTML = '<i class="bi bi-lock-fill"></i> Anda hanya bisa melihat booking ini (Dibuat oleh ' + creatorName + ').';
                     }
 
                     new bootstrap.Modal(document.getElementById('detailModal')).show();

@@ -56,7 +56,7 @@ class SendAgendaReminders extends Command
                 
                 // Kirim Pesan ke ID Grup tersebut
                 $this->sendMessage($token, $targetID, $agenda, $participantName);
-                // --- TAMBAHAN: Jeda 1 detik agar tidak dianggap spam ---
+                // --- TAMBAHAN: Jeda 3 detik agar tidak dianggap spam ---
                 sleep(3);
             }
         }

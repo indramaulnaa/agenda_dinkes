@@ -13,32 +13,41 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Akun Admin Sekretariat (Bisa dianggap Super Admin atau Admin Utama)
+        // 1. EKSEKUSI SUPER ADMIN DULU (PENTING)
+        $this->call([
+            SuperAdminSeeder::class,
+        ]);
+
+        // 2. Akun Admin Sekretariat
         User::create([
             'name' => 'Admin Sekretariat',
             'email' => 'sekretariat@dinkes.go.id',
-            'password' => Hash::make('password123'), // Password sama semua biar mudah diingat
+            'password' => Hash::make('password123'),
+            'role' => 'admin', // Set sebagai admin biasa
         ]);
 
-        // 2. Akun Admin Bidang Kesmas
+        // 3. Akun Admin Bidang Kesmas
         User::create([
             'name' => 'Admin Kesmas',
             'email' => 'kesmas@dinkes.go.id',
             'password' => Hash::make('password123'),
+            'role' => 'admin',
         ]);
 
-        // 3. Akun Admin Bidang P2P
+        // 4. Akun Admin Bidang P2P
         User::create([
             'name' => 'Admin P2P',
             'email' => 'p2p@dinkes.go.id',
             'password' => Hash::make('password123'),
+            'role' => 'admin',
         ]);
 
-        // 4. Akun Admin Yankes
+        // 5. Akun Admin Yankes
         User::create([
             'name' => 'Admin Yankes',
             'email' => 'yankes@dinkes.go.id',
             'password' => Hash::make('password123'),
+            'role' => 'admin',
         ]);
     }
 }

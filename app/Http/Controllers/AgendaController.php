@@ -36,9 +36,9 @@ class AgendaController extends Controller
         $events = $agendas->map(function ($agenda) {
             $color = $agenda->type == 'meeting_room' ? '#dc3545' : '#198754';
             
-            // --- LOGIKA SUPER ADMIN DI SINI ---
+            // --- LOGIKA SUPER ADMIN ---
             $isOwner = $agenda->user_id == Auth::id();
-            $isSuperAdmin = Auth::user()->role === 'super_admin'; // Cek role user
+            $isSuperAdmin = Auth::check() && Auth::user()->role === 'super_admin';
             
             // User boleh edit jika dia Pemilik ATAU Super Admin
             $canEdit = $isOwner || $isSuperAdmin; 
@@ -56,7 +56,7 @@ class AgendaController extends Controller
                 'borderColor' => $color,
                 'textColor' => '#ffffff',
                 'extendedProps' => [
-                    'can_edit' => $canEdit, // Kirim status izin ke frontend
+                    'can_edit' => $canEdit,
                     'creator_name' => $agenda->user ? $agenda->user->name : 'Unknown'
                 ]
             ];
@@ -77,19 +77,8 @@ class AgendaController extends Controller
         $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
         $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
 
-        // Cek Bentrok
-        if ($end_datetime) {
-            $conflicting = Agenda::where('location', $request->location)
-                ->where(function ($query) use ($start_datetime, $end_datetime) {
-                    $query->where('start_time', '<', $end_datetime)
-                          ->where('end_time', '>', $start_datetime);
-                })->first();
-
-            if ($conflicting) {
-                $booker = $conflicting->user ? $conflicting->user->name : 'Admin lain';
-                return redirect()->back()->with('error', "Gagal! Lokasi ini sedang dipakai oleh {$booker}.");
-            }
-        }
+        // --- HAPUS LOGIKA CEK BENTROK DI SINI ---
+        // Agenda kegiatan boleh bentrok/bersamaan.
 
         Agenda::create([
             'user_id' => Auth::id(),
@@ -110,12 +99,10 @@ class AgendaController extends Controller
     {
         $agenda = Agenda::findOrFail($id);
 
-        // --- UPDATE LOGIKA SECURITY (SUPER ADMIN) ---
-        // Jika User BUKAN Pemilik DAN User BUKAN Super Admin -> Tendang
+        // --- LOGIKA SECURITY (SUPER ADMIN) ---
         if ($agenda->user_id != Auth::id() && Auth::user()->role !== 'super_admin') {
             return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk mengubah agenda ini.');
         }
-        // --------------------------------------------
 
         $request->validate([
             'title' => 'required',
@@ -127,20 +114,7 @@ class AgendaController extends Controller
         $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
         $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
 
-        // Cek Bentrok (Kecuali Punya Sendiri)
-        if ($end_datetime) {
-            $conflicting = Agenda::where('location', $request->location)
-                ->where('id', '!=', $id)
-                ->where(function ($query) use ($start_datetime, $end_datetime) {
-                    $query->where('start_time', '<', $end_datetime)
-                          ->where('end_time', '>', $start_datetime);
-                })->first();
-
-            if ($conflicting) {
-                $booker = $conflicting->user ? $conflicting->user->name : 'Admin lain';
-                return redirect()->back()->with('error', "Gagal Update! Lokasi bentrok dengan {$booker}.");
-            }
-        }
+        // --- HAPUS LOGIKA CEK BENTROK DI SINI JUGA ---
 
         $agenda->update([
             'title' => $request->title,
@@ -150,7 +124,7 @@ class AgendaController extends Controller
             'participants' => $request->participants ?? [],
             'description' => $request->description,
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
-            'notification_sent' => false, // Reset agar notifikasi dikirim ulang jika jadwal berubah
+            'notification_sent' => false,
         ]);
 
         return redirect()->route('agenda.index')->with('success', 'Agenda berhasil diperbarui');
@@ -160,19 +134,13 @@ class AgendaController extends Controller
     {
         $agenda = Agenda::findOrFail($id);
 
-        // --- UPDATE LOGIKA SECURITY (SUPER ADMIN) ---
-        // Jika User BUKAN Pemilik DAN User BUKAN Super Admin -> Tendang
+        // --- LOGIKA SECURITY (SUPER ADMIN) ---
         if ($agenda->user_id != Auth::id() && Auth::user()->role !== 'super_admin') {
             return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk menghapus agenda ini.');
         }
-        // --------------------------------------------
 
         $agenda->delete();
 
         return redirect()->back()->with('success', 'Agenda berhasil dihapus');
-    }
-
-    public function welcome() {
-        return view('welcome');
     }
 }
