@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Booking Meeting Room')
+@section('title', 'Meeting Room')
 @section('page_title', 'Meeting Room')
 @section('page_subtitle', 'Kelola jadwal penggunaan ruang rapat dinas')
 
@@ -8,32 +8,101 @@
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     <style>
-        .calendar-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eaeaea; }
-        .fc-toolbar-title { font-size: 1.5rem !important; font-weight: 700; color: #1f2937; }
-        .fc-col-header-cell { background-color: #f9fafb !important; padding: 15px 0 !important; border-bottom: 1px solid #eaeaea !important; }
-        .fc-col-header-cell-cushion { color: #6b7280 !important; text-decoration: none !important; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .fc-daygrid-day-number { color: #374151 !important; text-decoration: none !important; font-weight: 500; margin: 4px; padding: 4px 8px; }
-        .fc-day-today { background: none !important; }
-        .fc .fc-button-primary { background-color: transparent !important; border: none !important; color: #6b7280 !important; font-weight: 600; box-shadow: none !important; padding: 8px 16px; transition: 0.2s; }
-        .fc .fc-button-primary:hover { background-color: #f3f4f6 !important; color: #111827 !important; }
-        .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active { background-color: #e5e7eb !important; color: #111827 !important; font-weight: 800 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important; }
-        .fc-daygrid-event { border: none !important; padding: 4px 8px !important; border-radius: 6px; margin-top: 4px !important; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
-        .event-time-text { font-weight: 900 !important; margin-right: 6px; }
-        .btn-custom-red { background-color: #dc3545; border: none; color: white; font-weight: 600; padding: 10px 20px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-custom-red:hover { background-color: #b02a37; color: white; }
+        /* --- STYLE DASAR --- */
+        .calendar-card {
+            background: white; padding: 25px;
+            border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f3f4f6;
+        }
+        
+        /* HEADER & BUTTONS KALENDER */
+        .fc-toolbar-title { font-size: 1.5rem !important; font-weight: 800; color: #1f2937; letter-spacing: -0.5px; }
+        .fc .fc-button {
+            background-color: transparent !important; border: none !important; box-shadow: none !important;
+            color: #9ca3af !important; font-weight: 600 !important; font-size: 0.9rem !important;
+            padding: 8px 16px !important; text-transform: capitalize; transition: all 0.2s ease;
+        }
+        .fc .fc-button:hover { color: #374151 !important; background: #f3f4f6 !important; border-radius: 8px; }
+        .fc .fc-icon { font-size: 1.2rem; font-weight: bold; color: #111827; }
+
+        /* Tombol Aktif (ORANYE Kapsul) */
+        .fc-dayGridMonth-button.fc-button-active, 
+        .fc-listMonth-button.fc-button-active {
+            color: #fd7e14 !important;
+            background-color: #fff7ed !important;
+            border-radius: 50px !important;
+            padding: 8px 24px !important;
+            font-weight: 800 !important;
+        }
+        .fc-today-button {
+            color: #111827 !important; background-color: #f3f4f6 !important;
+            border-radius: 50px !important; padding: 8px 20px !important; margin-right: 5px !important;
+        }
+
+        /* KALENDER ELEMEN */
+        .fc-col-header-cell { background-color: #f9fafb !important; padding: 15px 0 !important; border: none !important; border-bottom: 1px solid #f3f4f6 !important; }
+        .fc-scrollgrid { border: none !important; }
+        .fc-theme-standard td, .fc-theme-standard th { border: 1px solid #f3f4f6; }
+        .fc-col-header-cell-cushion { text-decoration: none !important; color: #6b7280 !important; font-weight: 700 !important; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        .fc-daygrid-day-top { justify-content: center; margin-top: 5px; }
+        .fc-daygrid-day-number { color: #4b5563 !important; text-decoration: none !important; font-weight: 600; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 2; }
+        .fc-day-today { background: transparent !important; }
+        .fc-day-today .fc-daygrid-day-number { background-color: #fd7e14 !important; color: white !important; box-shadow: 0 4px 10px rgba(253, 126, 20, 0.3); }
+        
+        .fc-daygrid-event { border: none !important; padding: 2px !important; margin-top: 4px !important; background: transparent !important; cursor: pointer; }
+        
+        .event-capsule {
+            display: flex; align-items: center; gap: 8px; padding: 5px 10px;
+            border-radius: 8px; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            transition: transform 0.1s; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .event-capsule:hover { transform: scale(1.02); }
+        .event-time { font-weight: 800; font-size: 0.75rem; }
+        .event-title { font-weight: 400; }
+
+        .fc-list-table td { border: none !important; background: transparent !important; }
+        .fc-list-day-cushion { background-color: transparent !important; padding-top: 20px !important; }
+        .fc-list-day-text { font-size: 1.1rem; font-weight: 800; color: #111827; text-decoration: none !important; }
+        .fc-list-day-side-text { font-weight: 600; color: #9ca3af !important; text-decoration: none !important; }
+        .fc-list-event-time, .fc-list-event-graphic { display: none !important; }
+        
+        .agenda-list-card { 
+            padding: 15px 20px; border-radius: 12px; margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;
+            transition: transform 0.2s; border: none;
+        }
+        .agenda-list-card:hover { transform: translateY(-2px); }
+        .list-time { font-weight: 800; font-size: 0.95rem; margin-bottom: 2px; }
+        .list-title { font-weight: 400; font-size: 1rem; }
+        .list-loc { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; display: flex; align-items: center; gap: 5px;}
+
+        /* TOMBOL UTAMA */
+        .btn-custom-orange { 
+            background: linear-gradient(135deg, #fd7e14 0%, #d9480f 100%); border: none; color: white; 
+            font-weight: 700; padding: 10px 25px; border-radius: 50px; display: inline-flex; align-items: center; gap: 8px; 
+            box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3); transition: all 0.3s ease;
+        }
+        .btn-custom-orange:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(253, 126, 20, 0.4); color: white; }
+
+        /* MODAL STYLING */
+        .detail-label-small { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .detail-text-content { font-size: 1rem; color: #1f2937; font-weight: 600; }
+        .desc-box { background: #f9fafb; padding: 20px; border-radius: 12px; border: 1px solid #f3f4f6; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
+        .modal-content { border-radius: 16px; border: none; overflow: hidden; }
         .form-label-bold { font-weight: 600; font-size: 0.9rem; color: #374151; }
         .select2-container .select2-selection--multiple { min-height: 38px; border: 1px solid #ced4da; border-radius: 0.375rem; }
     </style>
 
-    <div class="d-flex gap-2 justify-content-end mb-4">
-        <button class="btn btn-custom-red" data-bs-toggle="modal" data-bs-target="#createModal">
-            <i class="bi bi-calendar-plus"></i> Booking Ruangan
+    <div class="d-flex justify-content-end mb-4">
+        <button class="btn btn-custom-orange" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="bi bi-calendar-plus fs-6"></i> Booking Ruangan
         </button>
     </div>
 
@@ -48,30 +117,34 @@
 
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom-0 pb-0"><h5 class="modal-title fw-bold">Detail Booking</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
-                    <h4 id="detailTitle" class="fw-bold text-danger mb-3"></h4>
-                    
-                    <div class="d-flex align-items-center mb-2 text-secondary">
-                        <i class="bi bi-person-badge me-2 fs-5"></i> 
-                        <span id="detailCreator"></span>
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-bottom-0 pb-0" style="padding: 20px 25px;">
+                    <div class="d-flex align-items-center text-muted small"><i class="bi bi-building me-1"></i> Detail Booking</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding: 0 25px 25px 25px;">
+                    <h3 id="detailTitle" class="fw-bold text-dark mb-1 mt-1" style="line-height: 1.3;"></h3>
+                    <div class="text-secondary small mb-4">Dibuat oleh: <span id="detailCreator" class="fw-bold text-danger"></span></div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12"><div class="detail-label-small">Waktu Penggunaan</div><div id="detailTime" class="detail-text-content"></div></div>
+                        <div class="col-12"><div class="detail-label-small">Ruangan</div><div id="detailLocation" class="detail-text-content"></div></div>
                     </div>
 
-                    <div class="d-flex align-items-center mb-2 text-muted"><i class="bi bi-clock me-2 fs-5"></i> <span id="detailTime"></span></div>
-                    <div class="d-flex align-items-center mb-2 text-muted"><i class="bi bi-geo-alt me-2 fs-5"></i> <span id="detailLocation"></span></div>
-                    <div class="mb-3"><div class="d-flex align-items-center mb-2 text-muted"><i class="bi bi-people me-2 fs-5"></i> Divisi/Peserta:</div><div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-1"></div></div>
-                    <div class="p-3 bg-light rounded text-secondary mb-3" id="detailDesc"></div>
-                    
-                    <div id="notOwnerAlert" class="alert alert-warning border-0 small mb-0" style="display:none;">
-                        </div>
+                    <div class="mb-4">
+                        <div class="detail-label-small mb-2">Bidang / Peserta</div>
+                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2"></div>
+                    </div>
 
-                    <hr>
-                    <div id="actionButtons" class="d-flex gap-2" style="display: none;">
-                        <button id="btnOpenEdit" class="btn btn-warning text-white flex-grow-1"><i class="bi bi-pencil-square"></i> Edit</button>
-                        <form id="formDelete" action="#" method="POST" class="flex-grow-1">
+                    <div class="desc-box mb-3" id="detailDesc"></div>
+                    
+                    <div id="notOwnerAlert" class="alert alert-warning border-0 small align-items-center mb-3" style="display:none; border-radius: 12px; background-color: #fff3cd; color: #856404; border-left: 5px solid #ffc107;"></div>
+
+                    <div id="actionButtons" class="d-flex gap-2 mt-4" style="display: none;">
+                        <button id="btnOpenEdit" class="btn btn-warning text-white fw-bold py-2 flex-grow-1 shadow-sm rounded-pill"><i class="bi bi-pencil-square me-2"></i> Edit Booking</button>
+                        <form id="formDelete" action="javascript:void(0);" method="POST" class="flex-grow-1">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Hapus booking ini?')"><i class="bi bi-trash"></i> Hapus</button>
+                            <button type="submit" class="btn btn-danger fw-bold w-100 py-2 shadow-sm rounded-pill" onclick="return confirm('Batalkan booking ruangan ini?')"><i class="bi bi-trash me-2"></i> Batalkan</button>
                         </form>
                     </div>
                 </div>
@@ -82,36 +155,82 @@
     <div class="modal fade" id="createModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold text-danger">Booking Baru</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold">Booking Ruangan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body pt-0">
-                    <form action="{{ route('meeting-room.store') }}" method="POST">
+                    <form action="{{ route('agenda.store') }}" method="POST">
                         @csrf
-                        <div class="mb-3"><label class="form-label-bold">Pilih Ruangan <span class="text-danger">*</span></label><select name="location" class="form-select form-select-lg" required><option value="" selected disabled>-- Pilih Ruangan --</option><option value="Aula Utama">Aula Utama</option><option value="Ruang Rapat A">Ruang Rapat A</option><option value="Ruang Rapat B">Ruang Rapat B</option><option value="Ruang Diskusi Kecil">Ruang Diskusi Kecil</option></select></div>
-                        <div class="mb-3"><label class="form-label-bold">Kegiatan</label><input type="text" name="title" class="form-control" required></div>
-                        <div class="mb-3"><label class="form-label-bold">Tanggal</label><input type="date" name="date" class="form-control" required></div>
-                        <div class="row mb-3"><div class="col-md-6"><label class="form-label-bold">Mulai</label><input type="text" name="start_hour" class="form-control timepicker-24h bg-white" placeholder="08:00" required></div><div class="col-md-6"><label class="form-label-bold">Selesai</label><input type="text" name="end_hour" class="form-control timepicker-24h bg-white" placeholder="10:00" required></div></div>
-                        <div class="mb-3"><label class="form-label-bold">Peserta</label><select name="participants[]" class="form-select select2-create" multiple="multiple" style="width: 100%"><option value="Seluruh Pegawai">Seluruh Pegawai</option><option value="Sekretariat">Sekretariat</option><option value="Bidang Kesmas">Bidang Kesmas</option><option value="Bidang P2P">Bidang P2P</option><option value="Bidang Yankes">Bidang Yankes</option><option value="Bidang SDK">Bidang SDK</option></select></div>
-                        <div class="mb-3"><label class="form-label-bold">Catatan</label><textarea name="description" class="form-control" rows="2"></textarea></div>
-                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-custom-red">Booking</button></div>
+                        <input type="hidden" name="type" value="meeting_room">
+                        
+                        <div class="mb-3"><label class="form-label-bold">Nama Kegiatan <span class="text-danger">*</span></label><input type="text" name="title" class="form-control" required></div>
+                        <div class="mb-3"><label class="form-label-bold">Tanggal <span class="text-danger">*</span></label><input type="date" name="date" class="form-control" required></div>
+                        <div class="row mb-3"><div class="col-md-6"><label class="form-label-bold">Mulai</label><input type="text" name="start_hour" class="form-control timepicker-24h bg-white" placeholder="08:00" required></div><div class="col-md-6"><label class="form-label-bold">Selesai</label><input type="text" name="end_hour" class="form-control timepicker-24h bg-white" placeholder="12:00"></div></div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label-bold">Pilih Ruangan <span class="text-danger">*</span></label>
+                            <select name="location" class="form-select" required>
+                                <option value="" selected disabled>-- Pilih Ruangan --</option>
+                                <option value="Aula Utama">Aula Utama</option>
+                                <option value="Ruang Rapat A">Ruang Rapat A</option>
+                                <option value="Ruang Rapat B">Ruang Rapat B</option>
+                                <option value="Ruang Zoom Meeting">Ruang Zoom Meeting</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label-bold">Bidang Pengguna</label>
+                            <select name="participants[]" class="form-select select2-create" multiple="multiple" style="width: 100%">
+                                <option value="Sekretariat">Sekretariat</option>
+                                <option value="Bidang Kesmas">Bidang Kesmas</option>
+                                <option value="Bidang P2P">Bidang P2P</option>
+                                <option value="Bidang Yankes">Bidang Yankes</option>
+                                <option value="Bidang SDK">Bidang SDK</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3"><label class="form-label-bold">Keterangan Tambahan</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+                        
+                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-custom-orange">Simpan Booking</button></div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold text-warning">Edit Booking</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold">Edit Booking Ruangan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body pt-0">
-                    <form id="formEditBooking" method="POST">
+                    <form id="formEditAgenda" method="POST">
                         @csrf @method('PUT')
-                        <div class="mb-3"><label class="form-label-bold">Pilih Ruangan <span class="text-danger">*</span></label><select id="editLocation" name="location" class="form-select form-select-lg" required><option value="Aula Utama">Aula Utama</option><option value="Ruang Rapat A">Ruang Rapat A</option><option value="Ruang Rapat B">Ruang Rapat B</option><option value="Ruang Diskusi Kecil">Ruang Diskusi Kecil</option></select></div>
-                        <div class="mb-3"><label class="form-label-bold">Kegiatan</label><input type="text" id="editTitle" name="title" class="form-control" required></div>
+                        <input type="hidden" name="type" value="meeting_room">
+                        
+                        <div class="mb-3"><label class="form-label-bold">Nama Kegiatan</label><input type="text" id="editTitle" name="title" class="form-control" required></div>
                         <div class="mb-3"><label class="form-label-bold">Tanggal</label><input type="date" id="editDate" name="date" class="form-control" required></div>
-                        <div class="row mb-3"><div class="col-md-6"><label class="form-label-bold">Mulai</label><input type="text" id="editStart" name="start_hour" class="form-control timepicker-24h bg-white" required></div><div class="col-md-6"><label class="form-label-bold">Selesai</label><input type="text" id="editEnd" name="end_hour" class="form-control timepicker-24h bg-white" required></div></div>
-                        <div class="mb-3"><label class="form-label-bold">Peserta</label><select id="editParticipants" name="participants[]" class="form-select select2-edit" multiple="multiple" style="width: 100%"><option value="Seluruh Pegawai">Seluruh Pegawai</option><option value="Sekretariat">Sekretariat</option><option value="Bidang Kesmas">Bidang Kesmas</option><option value="Bidang P2P">Bidang P2P</option><option value="Bidang Yankes">Bidang Yankes</option><option value="Bidang SDK">Bidang SDK</option></select></div>
-                        <div class="mb-3"><label class="form-label-bold">Catatan</label><textarea id="editDescription" name="description" class="form-control" rows="2"></textarea></div>
+                        <div class="row mb-3"><div class="col-md-6"><label class="form-label-bold">Mulai</label><input type="text" id="editStart" name="start_hour" class="form-control timepicker-24h bg-white" required></div><div class="col-md-6"><label class="form-label-bold">Selesai</label><input type="text" id="editEnd" name="end_hour" class="form-control timepicker-24h bg-white"></div></div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label-bold">Pilih Ruangan</label>
+                            <select id="editLocation" name="location" class="form-select" required>
+                                <option value="Aula Utama">Aula Utama</option>
+                                <option value="Ruang Rapat A">Ruang Rapat A</option>
+                                <option value="Ruang Rapat B">Ruang Rapat B</option>
+                                <option value="Ruang Zoom Meeting">Ruang Zoom Meeting</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label-bold">Bidang Pengguna</label>
+                            <select id="editParticipants" name="participants[]" class="form-select select2-edit" multiple="multiple" style="width: 100%">
+                                <option value="Sekretariat">Sekretariat</option>
+                                <option value="Bidang Kesmas">Bidang Kesmas</option>
+                                <option value="Bidang P2P">Bidang P2P</option>
+                                <option value="Bidang Yankes">Bidang Yankes</option>
+                                <option value="Bidang SDK">Bidang SDK</option>
+                            </select>
+                        </div>
+                        <div class="mb-3"><label class="form-label-bold">Keterangan</label><textarea id="editDescription" name="description" class="form-control" rows="3"></textarea></div>
+                        
                         <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-warning text-white fw-bold">Update Booking</button></div>
                     </form>
                 </div>
@@ -121,10 +240,13 @@
 
     <script>
         $(document).ready(function() {
-            $('.select2-create').select2({ dropdownParent: $('#createModal'), placeholder: "Pilih divisi", allowClear: true });
-            $('.select2-edit').select2({ dropdownParent: $('#editModal'), placeholder: "Pilih divisi", allowClear: true });
-            $(".timepicker-24h").flatpickr({ enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+            $('.select2-create').select2({ dropdownParent: $('#createModal'), placeholder: "Pilih...", allowClear: true });
+            $('.select2-edit').select2({ dropdownParent: $('#editModal'), placeholder: "Pilih...", allowClear: true });
+            $(".timepicker-24h").flatpickr({ enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true, allowInput: true, minuteIncrement: 1 });
         });
+
+        // Warna Tema ROOMS
+        const colors = { even: { bg: '#ffe8cc', text: '#d9480f' }, odd:  { bg: '#ffe3e3', text: '#c92a2a' } };
 
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -132,8 +254,7 @@
                 initialView: 'dayGridMonth',
                 locale: 'id',
                 headerToolbar: { left: 'title', center: '', right: 'dayGridMonth,listMonth prev,today,next' },
-                buttonText: { today: 'Hari Ini', month: 'Bulan', list: 'List' },
-                
+                buttonText: { dayGridMonth: 'Rooms', listMonth: 'List', today: 'Hari Ini' },
                 events: '{{ route("agenda.feed") }}?type=meeting_room', 
 
                 datesSet: function(info) {
@@ -145,103 +266,125 @@
                             if (dateStr) {
                                 var headerDate = new Date(dateStr); headerDate.setHours(0,0,0,0);
                                 if (headerDate < now) { header.style.display = 'none'; }
-                                if (dateStr === todayStr) { var titleEl = header.querySelector('.fc-list-day-text'); if(titleEl) { titleEl.innerText = "Hari Ini"; titleEl.style.color = "#198754"; } }
+                                if (dateStr === todayStr) { 
+                                    var titleEl = header.querySelector('.fc-list-day-text');
+                                    if(titleEl) { titleEl.innerText = "Hari Ini"; titleEl.style.color = "#fd7e14"; } 
+                                }
                             }
                         });
                     }
                 },
-                eventDidMount: function(arg) { if (arg.view.type === 'listMonth') { var now = new Date(); now.setHours(0,0,0,0); if (arg.event.start < now) { arg.el.style.display = 'none'; } } },
-                
+                eventDidMount: function(arg) { 
+                    if (arg.view.type === 'listMonth') { 
+                        var now = new Date(); now.setHours(0,0,0,0); 
+                        if (arg.event.start < now) { arg.el.style.display = 'none'; } 
+                    } 
+                },
+
                 eventContent: function(arg) {
                     let event = arg.event;
                     let start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                    let eventId = parseInt(event.id) || 0;
+                    let theme = (eventId % 2 === 0) ? colors.even : colors.odd;
+
                     if (arg.view.type === 'listMonth') {
                         let end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                         let timeRange = end ? `${start} - ${end}` : start;
-                        let now = new Date(); let eventEnd = event.end || event.start;
-                        let badgeLabel = 'Akan Datang'; let badgeClass = 'bg-scheduled';
-                        if (now > eventEnd) { badgeLabel = 'Selesai'; badgeClass = 'bg-selesai'; } else if (now >= event.start && now <= eventEnd) { badgeLabel = 'Sedang Berlangsung'; badgeClass = 'bg-ongoing'; }
-                        let pData = event.extendedProps.participants; let pText = Array.isArray(pData) ? pData.join(', ') : pData; if (!pText) pText = "-";
-                        let card = document.createElement('div'); card.className = 'agenda-list-card';
-                        card.innerHTML = `<div class="d-flex justify-content-between align-items-start"><div><div class="card-time">${timeRange}</div><div class="card-title">${event.title}</div></div><span class="card-status-badge ${badgeClass}">${badgeLabel}</span></div><div class="card-location"><i class="bi bi-geo-alt-fill me-2 text-muted"></i> ${event.extendedProps.location || '-'}</div><div class="card-participants"><i class="bi bi-people-fill me-1"></i> ${pText}</div>`;
+                        let card = document.createElement('div');
+                        card.className = 'agenda-list-card';
+                        card.style.backgroundColor = theme.bg;
+                        card.style.color = theme.text;
+                        card.innerHTML = `<div><div class="list-time">${timeRange}</div><div class="list-title">${event.title}</div><div class="list-loc"><i class="bi bi-geo-alt-fill"></i> ${event.extendedProps.location || '-'}</div></div><i class="bi bi-pencil-square" style="opacity: 0.5;"></i>`;
                         return { domNodes: [card] };
                     } else {
-                        let content = document.createElement('div'); content.style.backgroundColor = event.backgroundColor; content.style.borderColor = event.borderColor; content.style.color = event.textColor; content.style.padding = '4px 8px'; content.style.borderRadius = '6px'; content.style.overflow = 'hidden'; content.style.whiteSpace = 'nowrap'; content.style.textOverflow = 'ellipsis'; content.innerHTML = `<span class="event-time-text">${start}</span> ${event.title}`;
-                        return { domNodes: [content] };
+                        let capsule = document.createElement('div');
+                        capsule.className = 'event-capsule';
+                        capsule.style.backgroundColor = theme.bg;
+                        capsule.style.color = theme.text;
+                        capsule.innerHTML = `<span class="event-time">${start}</span> <span class="event-title">${event.title}</span>`;
+                        return { domNodes: [capsule] };
                     }
                 },
 
+                // --- LOGIKA KLIK DETAIL (PERBAIKAN TOTAL) ---
                 eventClick: function(info) {
                     var event = info.event;
                     var props = event.extendedProps;
                     
+                    var actionButtons = document.getElementById('actionButtons'); 
+                    var notOwnerAlert = document.getElementById('notOwnerAlert');
+                    var btnOpenEdit = document.getElementById('btnOpenEdit');
+                    var formDelete = document.getElementById('formDelete');
+
+                    // 1. RESET TAMPILAN (Bersih-bersih)
+                    actionButtons.style.display = 'none'; 
+                    notOwnerAlert.style.display = 'none'; 
+                    notOwnerAlert.innerHTML = '';
+                    btnOpenEdit.onclick = null;
+                    
+                    // PENTING: Matikan form action
+                    formDelete.action = "javascript:void(0);";
+
                     document.getElementById('detailTitle').innerText = event.title;
                     document.getElementById('detailLocation').innerText = props.location || '-';
-                    document.getElementById('detailDesc').innerText = props.description || 'Tidak ada catatan.';
+                    document.getElementById('detailDesc').innerText = props.description || 'Tidak ada keterangan.';
                     
-                    // --- 1. Tampilkan Info Pembuat ---
                     var creatorName = props.creator_name || 'Admin lain';
-                    document.getElementById('detailCreator').innerHTML = 'Dibuat oleh: <strong>' + creatorName + '</strong>';
+                    document.getElementById('detailCreator').innerText = creatorName;
 
                     var wrapper = document.getElementById('detailParticipantsWrapper'); wrapper.innerHTML = ''; 
-                    var pData = props.participants; if(Array.isArray(pData)) { pData.forEach(p => { let b = document.createElement('span'); b.className='badge bg-light text-dark border me-1'; b.innerText=p; wrapper.appendChild(b); }); } else if (pData) { let b = document.createElement('span'); b.className='badge bg-light text-dark border'; b.innerText=pData; wrapper.appendChild(b); } else { wrapper.innerText = '-'; }
-
+                    var pData = props.participants; 
+                    if(Array.isArray(pData)) { pData.forEach(p => { let b = document.createElement('span'); b.className='badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle py-2 px-3 fw-normal'; b.innerText=p; wrapper.appendChild(b); }); } 
+                    else if (pData) { let b = document.createElement('span'); b.className='badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle py-2 px-3 fw-normal'; b.innerText=pData; wrapper.appendChild(b); } 
+                    else { wrapper.innerText = '-'; }
+                    
                     var start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                     var end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                     document.getElementById('detailTime').innerText = event.start.toLocaleDateString('id-ID', { dateStyle: 'full' }) + ' • ' + start + (end ? ' - ' + end : '');
-
-                    // URL Delete (Gunakan /agenda untuk delete, karena controller handle destroy di sana)
-                    // TAPI untuk EDIT, gunakan /meeting-room
-                    var baseUrl = "{{ url('/agenda') }}"; 
-                    document.getElementById('formDelete').action = baseUrl + "/" + event.id;
-
-                    var actionButtons = document.getElementById('actionButtons');
-                    var notOwnerAlert = document.getElementById('notOwnerAlert');
-
+                    
+                    // 2. LOGIKA HAK AKSES
                     if (props.can_edit) {
-                        actionButtons.style.display = 'flex';
-                        notOwnerAlert.style.display = 'none';
+                        // JIKA PEMILIK: Tampilkan Tombol
+                        actionButtons.style.display = 'flex'; 
+                        
+                        // SET LINK HAPUS YANG BENAR
+                        var baseUrl = "{{ url('/agenda') }}"; 
+                        if(event.id) {
+                            formDelete.action = baseUrl + "/" + event.id;
+                        }
 
-                        // SETUP TOMBOL EDIT
-                        document.getElementById('btnOpenEdit').onclick = function() {
-                            var detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                        btnOpenEdit.onclick = function() {
+                            var detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal')); 
                             detailModal.hide();
                             
-                            // ACTION URL KE ROUTE UPDATE MEETING ROOM
-                            document.getElementById('formEditBooking').action = "{{ url('/meeting-room') }}/" + event.id;
-                            
+                            document.getElementById('formEditAgenda').action = baseUrl + "/" + event.id;
                             document.getElementById('editTitle').value = event.title;
                             document.getElementById('editLocation').value = props.location;
                             document.getElementById('editDescription').value = props.description;
                             $('#editParticipants').val(props.participants).trigger('change');
-
-                            var year = event.start.getFullYear();
-                            var month = String(event.start.getMonth() + 1).padStart(2, '0');
-                            var day = String(event.start.getDate()).padStart(2, '0');
+                            
+                            var year = event.start.getFullYear(); var month = String(event.start.getMonth() + 1).padStart(2, '0'); var day = String(event.start.getDate()).padStart(2, '0');
                             document.getElementById('editDate').value = `${year}-${month}-${day}`;
-
-                            var startHour = String(event.start.getHours()).padStart(2, '0');
-                            var startMin = String(event.start.getMinutes()).padStart(2, '0');
-                            var timeStr = `${startHour}:${startMin}`;
-                            document.getElementById('editStart').value = timeStr;
+                            
+                            var startHour = String(event.start.getHours()).padStart(2, '0'); var startMin = String(event.start.getMinutes()).padStart(2, '0'); var timeStr = `${startHour}:${startMin}`;
+                            document.getElementById('editStart').value = timeStr; 
                             if(document.getElementById('editStart')._flatpickr) document.getElementById('editStart')._flatpickr.setDate(timeStr);
-
+                            
                             if(event.end) {
-                                var endHour = String(event.end.getHours()).padStart(2, '0');
-                                var endMin = String(event.end.getMinutes()).padStart(2, '0');
-                                var endStr = `${endHour}:${endMin}`;
-                                document.getElementById('editEnd').value = endStr;
+                                var endHour = String(event.end.getHours()).padStart(2, '0'); var endMin = String(event.end.getMinutes()).padStart(2, '0'); var endStr = `${endHour}:${endMin}`;
+                                document.getElementById('editEnd').value = endStr; 
                                 if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.setDate(endStr);
+                            } else {
+                                document.getElementById('editEnd').value = ''; 
+                                if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.clear();
                             }
                             
                             new bootstrap.Modal(document.getElementById('editModal')).show();
                         };
-
                     } else {
-                        actionButtons.style.display = 'none';
-                        notOwnerAlert.style.display = 'block';
-                        // --- 2. Update Teks Alert Sesuai Pembuat ---
-                        notOwnerAlert.innerHTML = '<i class="bi bi-lock-fill"></i> Anda hanya bisa melihat booking ini (Dibuat oleh ' + creatorName + ').';
+                        // JIKA BUKAN PEMILIK: Tampilkan Alert
+                        notOwnerAlert.style.display = 'flex';
+                        notOwnerAlert.innerHTML = '<i class="bi bi-lock-fill me-2 fs-5"></i><div>Maaf, Anda tidak memiliki izin untuk mengubah booking ini (Dibuat oleh <strong>' + creatorName + '</strong>).</div>';
                     }
 
                     new bootstrap.Modal(document.getElementById('detailModal')).show();

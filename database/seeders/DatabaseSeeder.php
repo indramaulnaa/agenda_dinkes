@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Setting;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,6 +18,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SuperAdminSeeder::class,
         ]);
+
+        // Default PIN
+        if (!Setting::where('key', 'site_pin')->exists()) {
+            Setting::create(['key' => 'site_pin', 'value' => '123456']);
+    }
 
         // 2. Akun Admin Sekretariat
         User::create([

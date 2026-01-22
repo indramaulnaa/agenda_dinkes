@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Setting;
 
 class SettingsController extends Controller
 {
@@ -15,29 +14,17 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        // 1. Ambil data user yang sedang login
-        $user = Auth::user();
-
-        // 2. Validasi input dari form
+        // Validasi
         $request->validate([
-            'name' => 'required|string|max:255',
-            // Password bersifat opsional (nullable), hanya divalidasi jika diisi
-            'password' => 'nullable|string|min:8|confirmed', 
+            'site_pin' => 'required|numeric|digits_between:4,8', // Minimal 4, Maksimal 8 angka
         ]);
 
-        // 3. Update Nama
-        $user->name = $request->name;
+        // Update atau Buat Baru jika belum ada
+        Setting::updateOrCreate(
+            ['key' => 'site_pin'],
+            ['value' => $request->site_pin]
+        );
 
-        // 4. Cek apakah user mengisi password baru?
-        if ($request->filled('password')) {
-            // Jika diisi, update password (jangan lupa di-Hash)
-            $user->password = Hash::make($request->password);
-        }
-
-        // 5. Simpan ke database
-        $user->save();
-
-        // 6. Kembali ke halaman settings dengan pesan sukses
-        return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
+        return redirect()->back()->with('success', 'PIN Keamanan Website berhasil diperbarui!');
     }
 }

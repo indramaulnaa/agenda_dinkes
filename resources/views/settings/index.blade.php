@@ -1,60 +1,91 @@
 @extends('layouts.admin')
 
-@section('title', 'Settings')
-@section('page_title', 'Pengaturan Akun')
-@section('page_subtitle', 'Kelola profil dan keamanan akun anda')
+@section('title', 'Pengaturan')
+@section('page_title', 'Settings')
+@section('page_subtitle', 'Pengaturan aplikasi dan sistem')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        
-        @if(session('success'))
-            <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
 
-        <div class="card border-0 shadow-sm rounded-3">
+<div class="row">
+    @if(Auth::user()->role === 'super_admin')
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-10 p-3 rounded-3 text-danger">
+                        <i class="bi bi-shield-lock-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Keamanan Website (PIN)</h5>
+                        <p class="text-muted small mb-0">Kode akses untuk halaman publik pegawai</p>
+                    </div>
+                </div>
+            </div>
             <div class="card-body p-4">
-                <h5 class="card-title fw-bold mb-4">Edit Profil & Password</h5>
-                
+                @if(session('success'))
+                    <div class="alert alert-success border-0 shadow-sm mb-3">
+                        <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+                    </div>
+                @endif
+
                 <form action="{{ route('settings.update') }}" method="POST">
                     @csrf
-                    
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nama Lengkap</label>
-                        <input type="text" name="name" class="form-control" value="{{ Auth::user()->name }}" required>
+                        <label class="form-label fw-bold">PIN Saat Ini</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key"></i></span>
+                            <input type="text" name="site_pin" class="form-control border-start-0" 
+                                value="{{ \App\Models\Setting::where('key', 'site_pin')->value('value') ?? '123456' }}" 
+                                placeholder="Masukkan PIN Baru">
+                        </div>
+                        <div class="form-text text-danger small">
+                            <i class="bi bi-exclamation-circle"></i> Hati-hati! Mengubah PIN akan mempengaruhi akses seluruh pegawai.
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control bg-light" value="{{ Auth::user()->email }}" readonly>
-                        <div class="form-text">Email tidak dapat diubah demi keamanan.</div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <h6 class="fw-bold mb-3 text-secondary">Ganti Password (Opsional)</h6>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Password Baru</label>
-                        <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengganti password">
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Konfirmasi Password Baru</label>
-                        <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru">
-                    </div>
-
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary px-4 fw-bold">
-                            <i class="bi bi-save me-2"></i> Simpan Perubahan
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-danger w-100 fw-bold">
+                        <i class="bi bi-save me-2"></i> Simpan PIN Baru
+                    </button>
                 </form>
             </div>
         </div>
     </div>
+    @endif
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary">
+                        <i class="bi bi-info-circle-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Informasi Aplikasi</h5>
+                        <p class="text-muted small mb-0">Versi dan status sistem</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Nama Aplikasi</span>
+                        <span class="fw-bold text-dark">Agenda Dinkes</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Versi</span>
+                        <span class="badge bg-light text-dark border">v1.0.0 (Release)</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Status Notifikasi WA</span>
+                        <span class="badge bg-success-subtle text-success">Aktif</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Zona Waktu</span>
+                        <span class="text-muted">{{ config('app.timezone') }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
+
 @endsection

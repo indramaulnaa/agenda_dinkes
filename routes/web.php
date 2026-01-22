@@ -85,9 +85,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/meeting-room/{id}', [MeetingRoomController::class, 'update'])->name('meeting-room.update');
     Route::delete('/meeting-room/{id}', [AgendaController::class, 'destroy'])->name('meeting-room.destroy');
 
-    // 4. Staff Data Management
-    Route::resource('staff', StaffController::class);
-
+    // 4. Laporan & Rekapitulasi (PENGGANTI STAFF)
+    Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/print', [App\Http\Controllers\ReportController::class, 'print'])->name('reports.print');
+    
     // 5. Settings Application
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/update', [SettingsController::class, 'update'])->name('settings.update');

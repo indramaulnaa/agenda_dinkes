@@ -136,8 +136,8 @@
             </a>
             </li>
             <li>
-                <a href="{{ route('staff.index') }}" class="{{ request()->routeIs('staff.*') ? 'active' : '' }}">
-                    <i class="bi bi-people"></i> Staff Data
+                <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                    <i class="bi bi-file-earmark-text-fill"></i> Laporan Kegiatan
                 </a>
             </li>
             <li>

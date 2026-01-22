@@ -7,123 +7,174 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 
     <style>
-        /* --- BACKGROUND IMAGE DENGAN OVERLAY --- */
+        /* --- BACKGROUND IMAGE --- */
         body { 
             font-family: 'Inter', sans-serif; 
-            background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed;
+            background: url('{{ asset('images/slide.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             min-height: 100vh;
             position: relative;
         }
-
-        /* Lapisan Putih Transparan */
         body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(248, 249, 250, 0.41); 
-            z-index: -1; 
-            backdrop-filter: blur(4px);
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0); 
+            z-index: -1; backdrop-filter: blur(2px);
         }
         
-        /* Navbar Style */
-        .navbar { background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid #eaeaea; padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); backdrop-filter: blur(5px); }
-        .brand-logo { width: 40px; height: 40px; background: #198754; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 12px;}
+        /* Navbar */
+        .navbar { background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid #eaeaea; padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .brand-logo img { height: 45px; margin-right: 12px; }
         .brand-text h5 { font-weight: 700; margin: 0; color: #111827; font-size: 1.1rem; }
         .brand-text p { margin: 0; font-size: 0.8rem; color: #6b7280; }
 
         /* Calendar Container */
-        .calendar-container { background: white; border-radius: 16px; border: 1px solid #eaeaea; box-shadow: 0 4px 20px rgba(0,0,0,0.03); padding: 30px; margin-top: 30px; margin-bottom: 50px; }
-        .fc-toolbar-title { font-size: 1.5rem !important; font-weight: 700; color: #1f2937; }
+        .calendar-container { 
+            background: white; border-radius: 24px; border: 1px solid #f3f4f6; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04); padding: 40px; margin-top: 30px; margin-bottom: 50px; 
+        }
         
-        /* TOMBOL TOOLBAR (CLEAN STYLE) */
-        .fc .fc-button-primary { background-color: transparent !important; border: none !important; color: #6b7280 !important; font-weight: 600; box-shadow: none !important; padding: 8px 16px; transition: 0.2s; }
-        .fc .fc-button-primary:hover { background-color: #f3f4f6 !important; color: #111827 !important; }
-        
-        /* ACTIVE STATE (Agar tombol yang aktif terlihat jelas) */
-        .fc .fc-button-primary:not(:disabled).fc-button-active, 
-        .fc .fc-button-primary:not(:disabled):active { 
-            background-color: #e5e7eb !important; 
-            color: #111827 !important; 
-            font-weight: 800 !important; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+        /* --- 1. CLEAN BUTTONS --- */
+        .fc-toolbar-title { font-size: 1.75rem !important; font-weight: 800; color: #111827; letter-spacing: -0.5px; }
+        .fc .fc-button {
+            background-color: transparent !important; border: none !important; box-shadow: none !important;
+            color: #9ca3af !important; font-weight: 600 !important; font-size: 0.95rem !important;
+            padding: 8px 12px !important; text-transform: capitalize; transition: all 0.2s ease;
+        }
+        .fc .fc-button:hover { color: #374151 !important; background: #f3f4f6 !important; border-radius: 8px; }
+        .fc .fc-icon { font-size: 1.2rem; font-weight: bold; color: #111827; }
+
+        /* --- 2. WARNA TOMBOL AKTIF --- */
+        /* Agenda & List (Hijau) */
+        .fc-btnAgenda-button.active-mode, 
+        body.theme-green .fc-listMonth-button.fc-button-active {
+            color: #198754 !important; background-color: #ecfdf5 !important;
+            border-radius: 50px !important; padding: 8px 20px !important; font-weight: 800 !important;
+        }
+        /* Rooms & List (Oranye) */
+        .fc-btnRooms-button.active-mode,
+        body.theme-orange .fc-listMonth-button.fc-button-active {
+            color: #fd7e14 !important; background-color: #fff7ed !important;
+            border-radius: 50px !important; padding: 8px 20px !important; font-weight: 800 !important;
+        }
+        /* Today */
+        .fc-today-button {
+            color: #111827 !important; background-color: #f3f4f6 !important;
+            border-radius: 50px !important; padding: 8px 20px !important; margin-right: 5px !important;
         }
 
-        /* Header Kalender */
-        .fc-col-header-cell { background-color: #f9fafb !important; padding: 15px 0 !important; border-bottom: 1px solid #eaeaea !important; }
-        .fc-col-header-cell-cushion { color: #6b7280 !important; text-decoration: none !important; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+        /* --- 3. HEADER KALENDER (CLEAN) --- */
+        .fc-col-header-cell {
+            background-color: #f9fafb !important; padding: 15px 0 !important;
+            border: none !important; border-bottom: 1px solid #f3f4f6 !important;
+        }
+        .fc-scrollgrid { border: none !important; }
+        .fc-theme-standard td, .fc-theme-standard th { border: 1px solid #f3f4f6; }
+
+        .fc-col-header-cell-cushion {
+            text-decoration: none !important; color: #6b7280 !important; font-weight: 700 !important;
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
+        }
+
+        /* --- 4. TANGGAL HARI INI (HIJAU/ORANYE) --- */
+        .fc-daygrid-day-top { justify-content: center; margin-top: 5px; }
+        .fc-daygrid-day-number { 
+            color: #4b5563 !important; text-decoration: none !important; font-weight: 600; 
+            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; z-index: 2;
+        }
+        .fc-day-today { background: transparent !important; }
         
-        /* Angka Tanggal */
-        .fc-daygrid-day-number { color: #374151 !important; text-decoration: none !important; font-weight: 500; margin: 4px; padding: 4px 8px; }
-        .fc-day-today { background: none !important; background-color: transparent !important; }
-        .fc-day-today .fc-daygrid-day-number { background-color: transparent !important; color: #111827 !important; font-weight: 800 !important; }
+        body.theme-green .fc-day-today .fc-daygrid-day-number { 
+            background-color: #198754 !important; color: white !important; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3);
+        }
+        body.theme-orange .fc-day-today .fc-daygrid-day-number { 
+            background-color: #fd7e14 !important; color: white !important; box-shadow: 0 4px 10px rgba(253, 126, 20, 0.3);
+        }
+
+        /* --- 5. KOTAK EVENT (KAPSUL) --- */
+        .fc-daygrid-event { border: none !important; padding: 2px !important; margin-top: 4px !important; background: transparent !important; }
+        .event-capsule {
+            display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+            border-radius: 8px; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            transition: transform 0.1s; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .event-capsule:hover { transform: scale(1.02); }
+        .event-time { font-weight: 800; font-size: 0.75rem; }
+        .event-title { font-weight: 400; }
+
+        /* --- 6. LIST VIEW CUSTOMIZATION --- */
+        .fc-list-table td { border: none !important; background: transparent !important; }
+        .fc-list-day-cushion { background-color: transparent !important; padding-top: 25px !important; }
         
-        /* STYLE KHUSUS LIST VIEW (KARTU) */
-        .fc-theme-standard .fc-list { border: none !important; }
-        .fc-theme-standard .fc-list-day-cushion { background-color: transparent !important; border: none !important; padding: 15px 0 10px 0 !important; }
-        .fc-list-event td { border: none !important; background: transparent !important; }
-        .fc-list-event:hover td { background: transparent !important; }
-        .fc-list-day-text, .fc-list-day-side-text { font-size: 1.1rem; font-weight: 700; color: #111827; text-decoration: none !important; }
-        .fc-list-day-cushion a { text-decoration: none !important; pointer-events: none; color: inherit !important; }
-        .fc-list-event-title { padding: 0 !important; border: none !important; }
+        /* HEADER LIST (TANGGAL & HARI) */
+        .fc-list-day-text { 
+            font-size: 1.1rem; font-weight: 800; color: #111827; text-decoration: none !important; 
+        }
+        /* Hari (Senin, Selasa) -> ABU-ABU */
+        .fc-list-day-side-text { 
+            font-weight: 600; color: #9ca3af !important; text-decoration: none !important; font-size: 1rem;
+        }
+        .fc-list-day-cushion a { text-decoration: none !important; pointer-events: none; }
+        
+        /* HIDE DEFAULT ELEMENTS */
         .fc-list-event-time, .fc-list-event-graphic { display: none !important; }
         .fc-list-empty { display: none !important; }
 
+        /* KARTU LIST */
         .agenda-list-card {
-            background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;
-            margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            transition: all 0.2s ease-in-out; cursor: pointer; 
+            padding: 15px 20px; border-radius: 12px; margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;
+            transition: transform 0.2s;
         }
-        .agenda-list-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: #198754; }
+        .agenda-list-card:hover { transform: translateY(-2px); }
+        .list-time { font-weight: 800; font-size: 0.95rem; margin-bottom: 2px; }
+        .list-title { font-weight: 400; font-size: 1rem; }
+        .list-loc { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; display: flex; align-items: center; gap: 5px;}
 
-        .card-status-badge { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bg-ongoing { background-color: #fff3cd; color: #664d03; } 
-        .bg-scheduled { background-color: #cfe2ff; color: #084298; } 
-        .bg-selesai { background-color: #d1e7dd; color: #0f5132; } 
-
-        .card-time { font-size: 1rem; font-weight: 800; color: #111827; margin-bottom: 4px; }
-        .card-title { font-size: 1.1rem; font-weight: 600; color: #374151; margin-bottom: 8px; line-height: 1.4; }
-        .card-location { font-size: 0.9rem; color: #6b7280; display: flex; align-items: center; gap: 6px; }
-        .card-participants { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e5e7eb; font-size: 0.85rem; color: #6b7280; }
-
-        /* GRID STYLE */
-        .fc-daygrid-event { border: none !important; padding: 4px 8px !important; border-radius: 6px; margin-top: 4px !important; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: none !important; }
-        .fc-daygrid-event:hover { opacity: 1 !important; filter: none !important; }
-        .event-time-text { font-weight: 900 !important; margin-right: 6px; }
-        
-        /* Modal Style */
-        .modal-title { font-weight: 700; color: #1f2937; }
-        .detail-label { font-size: 0.85rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .detail-content { font-size: 1rem; color: #111827; font-weight: 500; margin-bottom: 16px; }
-        .badge-participant { background-color: #e0f2fe; color: #0369a1; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; display: inline-block; border: 1px solid #bae6fd; margin-right: 4px; margin-bottom: 4px;}
-
+        /* Modal & Footer */
+        .modal-title { font-weight: 800; }
+        .detail-label { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .detail-content { font-size: 1rem; color: #111827; font-weight: 600; }
+        /* Warna putih dengan bayangan agar jelas */
+        .footer-link { 
+            text-decoration: none; 
+            color: white !important; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            transition: 0.2s; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+        .footer-link:hover { 
+            color: #198754 !important; 
+            text-decoration: underline;
+        }
         .btn-close-custom { background-color: #4b5563; border: none; color: white; font-weight: 700; padding: 10px; transition: all 0.3s ease; }
-        .btn-close-custom:hover { background-color: #000000 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .btn-close-custom:hover { background-color: #000000 !important; color: white !important; transform: translateY(-2px); }
     </style>
 </head>
-<body>
+<body class="theme-green"> 
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <div class="d-flex align-items-center">
-                <div class="brand-logo"><i class="bi bi-hospital"></i></div>
+                <div class="brand-logo me-3">
+                    <img src="{{ asset('images/logo_batang.png') }}" alt="Logo">
+                </div>
                 <div class="brand-text">
                     <h5>Dinas Kesehatan</h5>
-                    <p>Sistem Informasi Agenda</p>
+                    <p>Sistem Informasi Agenda Dinas Kesehatan</p>
                 </div>
             </div>
             <div class="ms-auto">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="btn btn-outline-success fw-bold px-4">Dashboard Admin</a>
+                        <a href="{{ url('/dashboard') }}" class="btn btn-outline-dark fw-bold px-4 rounded-pill">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-success fw-bold px-4">Login Admin</a>
+                        <a href="{{ route('login') }}" class="btn btn-dark fw-bold px-4 rounded-pill">Login</a>
                     @endauth
                 @endif
             </div>
@@ -132,48 +183,34 @@
 
     <div class="container" style="margin-top: 100px;">
         <div class="text-center mb-4">
-            <h2 class="fw-bold text-dark">Jadwal Kegiatan</h2>
-            <p class="text-secondary fw-medium">Agenda resmi kegiatan Dinas Kesehatan bulan ini</p>
+            <h2 class="fw-bold text-white mb-1" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Jadwal Kegiatan</h2>
+            <p class="text-white mb-0" style="text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Agenda resmi kegiatan Dinas Kesehatan bulan ini</p>
         </div>
 
         <div class="calendar-container">
             <div id='calendar'></div>
         </div>
         
-        <div class="text-center text-secondary fw-medium mb-5">
-            <small>&copy; {{ date('Y') }} Dinas Kesehatan. All rights reserved.</small>
+        <div class="text-center mb-5">
+            <a href="https://www.linkedin.com/in/indra-maulana-a33334250/" target="_blank" class="footer-link">
+                &copy; 2026 Dinas Kesehatan - Magang UNNES
+            </a>
         </div>
     </div>
 
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header border-bottom-0 pb-0">
                     <h5 class="modal-title">Detail Agenda</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <h4 id="detailTitle" class="fw-bold text-success mb-4" style="font-size: 1.4rem;"></h4>
-
-                    <div class="mb-3">
-                        <div class="detail-label"><i class="bi bi-clock me-1"></i> Waktu Pelaksanaan</div>
-                        <div id="detailTime" class="detail-content"></div>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="detail-label"><i class="bi bi-geo-alt me-1"></i> Lokasi</div>
-                        <div id="detailLocation" class="detail-content"></div>
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="detail-label"><i class="bi bi-people me-1"></i> Ditujukan Kepada</div>
-                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap"></div>
-                    </div>
-
-                    <div class="bg-light p-3 rounded border">
-                        <div class="detail-label mb-2">Catatan / Deskripsi</div>
-                        <div id="detailDesc" class="text-secondary" style="font-size: 0.95rem; line-height: 1.5;"></div>
-                    </div>
+                    <div class="mb-3"><div class="detail-label">Waktu</div><div id="detailTime" class="detail-content"></div></div>
+                    <div class="mb-3"><div class="detail-label">Lokasi</div><div id="detailLocation" class="detail-content"></div></div>
+                    <div class="mb-3"><div class="detail-label">Peserta</div><div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-1"></div></div>
+                    <div class="bg-light p-3 rounded-3 mt-3"><div class="detail-label mb-1">Catatan</div><div id="detailDesc" class="text-secondary small"></div></div>
                 </div>
                 <div class="modal-footer border-top-0 pt-0">
                     <button type="button" class="btn btn-close-custom w-100" data-bs-dismiss="modal">Tutup</button>
@@ -183,187 +220,190 @@
     </div>
 
     <script>
+        // GLOBAL VARIABLES
+        let currentType = 'general';
+        const colors = {
+            agenda: { even: { bg: '#d1e7dd', text: '#146c43' }, odd:  { bg: '#e0f2fe', text: '#0284c7' } },
+            rooms: { even: { bg: '#ffe5d0', text: '#c2410c' }, odd:  { bg: '#fee2e2', text: '#b91c1c' } }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'id',
                 
-                // --- CUSTOM BUTTONS DEFINITION ---
+                // --- CUSTOM BUTTONS ---
                 customButtons: {
                     btnAgenda: {
-                        text: 'Agenda', // Ini menggantikan tombol "Bulan"
-                        click: function() {
-                            // 1. Reset Event Source
-                            calendar.removeAllEventSources();
-                            // 2. Load Agenda Biasa (type=general)
-                            calendar.addEventSource("{{ route('agenda.feed') }}?type=general");
-                            
-                            // 3. Ubah Tampilan ke Grid Bulan (jika sedang di list)
-                            calendar.changeView('dayGridMonth');
-
-                            // 4. Update UI Tombol Aktif (Manual Toggle Class)
-                            updateActiveButton('btnAgenda');
-                        }
+                        text: 'Agenda',
+                        click: function() { loadEvents('general', 'btnAgenda'); }
                     },
                     btnRooms: {
                         text: 'Rooms',
-                        click: function() {
-                            // 1. Reset Event Source
-                            calendar.removeAllEventSources();
-                            // 2. Load Booking Ruangan (type=meeting_room)
-                            calendar.addEventSource("{{ route('agenda.feed') }}?type=meeting_room");
-                            
-                            // 3. Ubah Tampilan ke Grid Bulan
-                            calendar.changeView('dayGridMonth');
-
-                            // 4. Update UI Tombol Aktif
-                            updateActiveButton('btnRooms');
-                        }
+                        click: function() { loadEvents('meeting_room', 'btnRooms'); }
                     }
                 },
 
-                // --- TOOLBAR CONFIG ---
-                // 'btnAgenda' adalah pengganti 'Bulan'
-                // 'btnRooms' adalah tombol baru di sebelahnya
+                // --- POSISI TOMBOL ---
                 headerToolbar: {
                     left: 'title',
                     center: '',
-                    right: 'btnAgenda,btnRooms listMonth prev,today,next' 
+                    right: 'btnAgenda,btnRooms,listMonth prev,today,next' 
                 },
-                buttonText: { list: 'List' }, // 'Bulan' sudah diganti btnAgenda
-                
-                // --- LOAD DATA AWAL (DEFAULT: AGENDA BIASA) ---
-                events: '{{ route("agenda.feed") }}?type=general', 
+                buttonText: { list: 'List' }, 
+                events: '{{ route("agenda.feed") }}?type=general',
 
-                // Saat kalender render pertama kali, set btnAgenda jadi aktif
+                // --- 1. FILTER TANGGAL DI LIST (SEMBUNYIKAN YG LEWAT) ---
                 datesSet: function(info) {
-                    // Logic Hari Ini
                     if (info.view.type === 'listMonth') {
-                        var now = new Date(); now.setHours(0,0,0,0); 
-                        var todayStr = now.toISOString().split('T')[0];
+                        // Set waktu hari ini ke jam 00:00:00 untuk perbandingan murni tanggal
+                        var now = new Date(); 
+                        now.setHours(0,0,0,0); 
+                        
+                        var todayStr = now.getFullYear() + "-" + 
+                                       String(now.getMonth() + 1).padStart(2, '0') + "-" + 
+                                       String(now.getDate()).padStart(2, '0');
+
+                        // Loop semua header tanggal
                         document.querySelectorAll('.fc-list-day').forEach(function(header) {
                             var dateStr = header.getAttribute('data-date');
                             if (dateStr) {
-                                var headerDate = new Date(dateStr); headerDate.setHours(0,0,0,0);
-                                if (headerDate < now) { header.style.display = 'none'; }
+                                // Konversi string tanggal header ke objek Date (jam 00:00:00)
+                                var headerDate = new Date(dateStr); 
+                                headerDate.setHours(0,0,0,0);
+                                
+                                // LOGIKA UTAMA: Jika Tanggal Header < Hari Ini, Hapus/Sembunyikan
+                                if (headerDate < now) { 
+                                    header.style.display = 'none'; 
+                                }
+
+                                // Ubah Judul Hari Ini
                                 if (dateStr === todayStr) {
                                     var titleEl = header.querySelector('.fc-list-day-text');
-                                    if(titleEl) { titleEl.innerText = "Hari Ini"; titleEl.style.color = "#198754"; }
+                                    if(titleEl) { 
+                                        titleEl.innerText = "Hari Ini"; 
+                                        titleEl.style.color = currentType === 'general' ? '#198754' : '#fd7e14'; 
+                                    }
                                 }
                             }
                         });
                     }
                 },
 
+                // Sembunyikan item event (baris) jika tanggalnya lewat
                 eventDidMount: function(arg) {
                     if (arg.view.type === 'listMonth') {
-                        var now = new Date(); now.setHours(0,0,0,0); 
-                        if (arg.event.start < now) { arg.el.style.display = 'none'; }
+                        var now = new Date(); 
+                        now.setHours(0,0,0,0);
+                        
+                        // Cek tanggal event
+                        var eventDate = new Date(arg.event.start);
+                        eventDate.setHours(0,0,0,0);
+
+                        if (eventDate < now) { 
+                            arg.el.style.display = 'none'; 
+                        }
                     }
                 },
 
+                // --- RENDER CONTENT ---
                 eventContent: function(arg) {
                     let event = arg.event;
+                    // Format Jam Mulai - Selesai
                     let start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-                    
+                    let end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
+                    let timeDisplay = end ? `${start} - ${end}` : start;
+
+                    let eventId = parseInt(event.id) || 0;
+                    let themeSet = (currentType === 'general') ? colors.agenda : colors.rooms;
+                    let theme = (eventId % 2 === 0) ? themeSet.even : themeSet.odd;
+
+                    // 1. TAMPILAN LIST (Card Style)
                     if (arg.view.type === 'listMonth') {
-                        let end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
-                        let timeRange = end ? `${start} - ${end}` : start;
-                        
-                        let now = new Date();
-                        let eventEnd = event.end || event.start;
-                        
-                        let badgeLabel = 'Akan Datang'; let badgeClass = 'bg-scheduled';
-
-                        if (now > eventEnd) { 
-                            badgeLabel = 'Selesai'; badgeClass = 'bg-selesai'; 
-                        } else if (now >= event.start && now <= eventEnd) { 
-                            badgeLabel = 'Sedang Berlangsung'; badgeClass = 'bg-ongoing'; 
-                        }
-
-                        let pData = event.extendedProps.participants;
-                        let pText = Array.isArray(pData) ? pData.join(', ') : pData;
-                        if (!pText) pText = "-";
-
                         let card = document.createElement('div');
                         card.className = 'agenda-list-card';
+                        card.style.backgroundColor = theme.bg;
+                        card.style.color = theme.text;
+                        card.style.border = 'none'; 
+
                         card.innerHTML = `
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="card-time">${timeRange}</div>
-                                    <div class="card-title">${event.title}</div>
-                                </div>
-                                <span class="card-status-badge ${badgeClass}">${badgeLabel}</span>
+                            <div>
+                                <div class="list-time">${timeDisplay}</div> <div class="list-title">${event.title}</div>
+                                <div class="list-loc"><i class="bi bi-geo-alt-fill"></i> ${event.extendedProps.location || '-'}</div>
                             </div>
-                            <div class="card-location">
-                                <i class="bi bi-geo-alt-fill me-2 text-muted"></i> ${event.extendedProps.location || 'Lokasi tidak tersedia'}
-                            </div>
-                            <div class="card-participants">
-                                <i class="bi bi-people-fill me-1"></i> ${pText}
-                            </div>
+                            <i class="bi bi-chevron-right" style="opacity: 0.5;"></i>
                         `;
                         return { domNodes: [card] };
-
-                    } else {
-                        let content = document.createElement('div');
-                        content.style.backgroundColor = event.backgroundColor;
-                        content.style.borderColor = event.borderColor;
-                        content.style.color = event.textColor;
-                        content.style.padding = '4px 8px';
-                        content.style.borderRadius = '6px';
-                        content.style.overflow = 'hidden';
-                        content.style.whiteSpace = 'nowrap';
-                        content.style.textOverflow = 'ellipsis';
-                        content.innerHTML = `<span class="event-time-text">${start}</span> ${event.title}`;
-                        return { domNodes: [content] };
+                    } 
+                    // 2. TAMPILAN KALENDER (Capsule)
+                    else {
+                        let capsule = document.createElement('div');
+                        capsule.className = 'event-capsule';
+                        capsule.style.backgroundColor = theme.bg;
+                        capsule.style.color = theme.text;
+                        capsule.innerHTML = `<span class="event-time">${start}</span> <span class="event-title">${event.title}</span>`;
+                        return { domNodes: [capsule] };
                     }
                 },
 
                 eventClick: function(info) {
-                    var event = info.event;
-                    var props = event.extendedProps;
+                    var props = info.event.extendedProps;
+                    document.getElementById('detailTitle').innerText = info.event.title;
+                    
+                    var modalTitle = document.getElementById('detailTitle');
+                    modalTitle.className = currentType === 'general' ? 'fw-bold text-success mb-4' : 'fw-bold text-danger mb-4';
 
-                    document.getElementById('detailTitle').innerText = event.title;
                     document.getElementById('detailLocation').innerText = props.location || '-';
                     document.getElementById('detailDesc').innerText = props.description || '-';
-
-                    var wrapper = document.getElementById('detailParticipantsWrapper');
-                    wrapper.innerHTML = ''; 
-                    var pData = props.participants;
-                    if(Array.isArray(pData)) {
-                        pData.forEach(p => { let b = document.createElement('span'); b.className='badge-participant'; b.innerText=p; wrapper.appendChild(b); });
-                    } else if (pData) {
-                        let b = document.createElement('span'); b.className='badge-participant'; b.innerText=pData; wrapper.appendChild(b);
-                    } else { wrapper.innerText = 'Umum'; }
-
-                    var start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-                    var end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
-                    var dateStr = event.start.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                     
-                    document.getElementById('detailTime').innerText = `${dateStr} • ${start} ${end ? '- ' + end : ''}`;
+                    var dateStr = info.event.start.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+                    var start = info.event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                    var end = info.event.end ? info.event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
+                    document.getElementById('detailTime').innerText = `${dateStr} • ${start} - ${end}`;
+
+                    var wrapper = document.getElementById('detailParticipantsWrapper'); wrapper.innerHTML = '';
+                    var pData = props.participants;
+                    if(Array.isArray(pData)) pData.forEach(p => wrapper.innerHTML += `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 px-2 py-1 rounded-pill small me-1">${p}</span>`);
+                    else wrapper.innerHTML = `<span class="text-muted small">${pData || '-'}</span>`;
 
                     new bootstrap.Modal(document.getElementById('detailModal')).show();
-                }
+                },
             });
-            
+
             calendar.render();
 
-            // --- Helper: Set Tombol 'Agenda' Aktif saat load pertama ---
             setTimeout(() => {
-                updateActiveButton('btnAgenda');
+                document.querySelector('.fc-btnAgenda-button').classList.add('active-mode');
             }, 100);
-        });
 
-        // Fungsi manual untuk mengatur class 'active' pada tombol custom
-        function updateActiveButton(activeBtnClass) {
-            // Hapus class active dari kedua tombol
-            document.querySelector('.fc-btnAgenda-button').classList.remove('fc-button-active');
-            document.querySelector('.fc-btnRooms-button').classList.remove('fc-button-active');
-            
-            // Tambah class active ke tombol yang diklik
-            document.querySelector('.fc-' + activeBtnClass + '-button').classList.add('fc-button-active');
-        }
+            // FUNGSI GANTI EVENT & NAVIGASI KEMBALI
+            window.loadEvents = function(type, btnId) {
+                currentType = type;
+                
+                // 1. UPDATE CSS BODY
+                if(type === 'general') {
+                    document.body.classList.remove('theme-orange');
+                    document.body.classList.add('theme-green');
+                } else {
+                    document.body.classList.remove('theme-green');
+                    document.body.classList.add('theme-orange');
+                }
+
+                // 2. PAKSA KEMBALI KE KALENDER (GRID)
+                // Ini memperbaiki masalah tombol List tidak bisa kembali
+                calendar.changeView('dayGridMonth');
+
+                // 3. RELOAD DATA
+                calendar.removeAllEventSources();
+                calendar.addEventSource("{{ route('agenda.feed') }}?type=" + type);
+                
+                // 4. UPDATE TOMBOL AKTIF
+                document.querySelector('.fc-btnAgenda-button').classList.remove('active-mode');
+                document.querySelector('.fc-btnRooms-button').classList.remove('active-mode');
+                document.querySelector('.fc-' + btnId + '-button').classList.add('active-mode');
+            };
+        });
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
