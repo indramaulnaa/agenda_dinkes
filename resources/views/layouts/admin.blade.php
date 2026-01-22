@@ -112,7 +112,8 @@
 <div class="wrapper">
     <nav id="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-logo"><i class="bi bi-hospital"></i></div>
+            <img src="{{ asset('images/logo_batang.png') }}" alt="Logo Dinkes" style="width: 45px; height: auto;">
+            
             <div class="brand-text">
                 <h5>Dinas Kesehatan</h5>
                 <p>Admin Panel</p>

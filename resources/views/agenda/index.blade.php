@@ -96,16 +96,45 @@
         }
         .btn-custom-green:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(25, 135, 84, 0.4); color: white; }
 
-        /* --- STYLING MODAL DETAIL CLEAN --- */
+        /* --- STYLE MODAL DETAIL MODERN --- */
+        .modal-content { border-radius: 20px; border: none; overflow: hidden; }
         .detail-label-small { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .detail-text-content { font-size: 1rem; color: #1f2937; font-weight: 600; }
-        .desc-box { background: #f9fafb; padding: 20px; border-radius: 12px; border: 1px solid #f3f4f6; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
-        .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+        .detail-text-content { font-size: 1.05rem; color: #1f2937; font-weight: 600; }
+        .detail-section { margin-bottom: 25px; display: flex; gap: 18px; align-items: center; }
+        
+        /* ICON MODERN (Lingkaran + Gradient) */
+        .detail-icon-box {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .detail-icon-box:hover { transform: translateY(-3px) scale(1.05); }
+
+        /* Varian Warna Icon */
+        .icon-time { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7; }
+        .icon-loc { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; }
+        .icon-people { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #16a34a; }
+
+        .desc-box { background: #f9fafb; padding: 20px; border-radius: 16px; border: 1px solid #f3f4f6; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
 
         /* MODAL & FORM UMUM */
         .form-label-bold { font-weight: 600; font-size: 0.9rem; color: #374151; }
         .wa-toggle-card { background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; display: flex; align-items: center; justify-content: space-between;}
         .select2-container .select2-selection--multiple { min-height: 38px; border: 1px solid #ced4da; border-radius: 0.375rem; }
+
+        /* --- SELECT2 HIJAU KOTAK TUMPUL --- */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #198754 !important; border: none !important; color: white !important;
+            border-radius: 8px !important; padding: 5px 10px !important; font-size: 0.85rem !important; font-weight: 600 !important; margin-top: 6px !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white !important; border-right: 1px solid rgba(255,255,255,0.3) !important; margin-right: 5px !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #146c43 !important; }
     </style>
 
     <div class="d-flex gap-3 justify-content-end mb-4">
@@ -129,33 +158,50 @@
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
-                <div class="modal-header border-bottom-0 pb-0" style="padding: 20px 25px;">
-                    <div class="d-flex align-items-center text-muted small">
-                        <i class="bi bi-hash me-1"></i> Detail Kegiatan
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header border-bottom-0 pb-0" style="padding: 25px 30px 10px;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="opacity: 0.5;"></button>
                 </div>
                 
-                <div class="modal-body" style="padding: 0 25px 25px 25px;">
-                    <h3 id="detailTitle" class="fw-bold text-dark mb-1 mt-1" style="line-height: 1.3;"></h3>
+                <div class="modal-body" style="padding: 0 30px 30px 30px;">
+                    <h3 id="detailTitle" class="fw-bold text-dark mb-1 mt-0" style="line-height: 1.3; font-size: 1.6rem;"></h3>
                     <div class="text-secondary small mb-4">
                         Dibuat oleh: <span id="detailCreator" class="fw-bold text-success"></span>
                     </div>
 
-                    <div class="row g-3 mb-4">
+                    <div class="row mb-2">
                         <div class="col-12">
-                            <div class="detail-label-small">Waktu Pelaksanaan</div>
-                            <div id="detailTime" class="detail-text-content"></div>
+                            <div class="detail-section">
+                                <div class="detail-icon-box icon-time">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="detail-label-small">Waktu Pelaksanaan</div>
+                                    <div id="detailTime" class="detail-text-content"></div>
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="col-12">
-                            <div class="detail-label-small">Tempat / Lokasi</div>
-                            <div id="detailLocation" class="detail-text-content"></div>
+                            <div class="detail-section">
+                                <div class="detail-icon-box icon-loc">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="detail-label-small">Tempat / Lokasi</div>
+                                    <div id="detailLocation" class="detail-text-content"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <div class="detail-label-small mb-2">Peserta / Tujuan</div>
-                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2"></div>
+                        <div class="d-flex align-items-center mb-3 gap-3">
+                             <div class="detail-icon-box icon-people" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="detail-label-small mb-0" style="font-size: 0.85rem;">Peserta / Tujuan</div>
+                        </div>
+                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2 ps-2"></div>
                     </div>
 
                     <div class="desc-box mb-3" id="detailDesc"></div>
@@ -211,7 +257,11 @@
                             <div><div class="fw-bold text-success"><i class="bi bi-whatsapp"></i> Kirim Notifikasi WhatsApp</div><div class="small text-secondary">Pesan dikirim otomatis 30 menit sebelum acara</div></div>
                             <div class="form-check form-switch"><input class="form-check-input fs-4" type="checkbox" name="is_whatsapp_notify" value="1"></div>
                         </div>
-                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-custom-green">Simpan Jadwal</button></div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-custom-green">Simpan Jadwal</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -246,7 +296,11 @@
                             <div><div class="fw-bold text-success"><i class="bi bi-whatsapp"></i> Kirim Notifikasi WhatsApp</div><div class="small text-secondary">Update pengingat ke peserta via WhatsApp</div></div>
                             <div class="form-check form-switch"><input id="editWa" class="form-check-input fs-4" type="checkbox" name="is_whatsapp_notify" value="1"></div>
                         </div>
-                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-warning text-white fw-bold">Update Agenda</button></div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-warning text-white fw-bold">Update Agenda</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -320,7 +374,6 @@
                     }
                 },
 
-                // --- LOGIKA EVENT CLICK (PERBAIKAN ALERT) ---
                 eventClick: function(info) {
                     var event = info.event;
                     var props = event.extendedProps;
@@ -331,15 +384,14 @@
                     var detailWaActive = document.getElementById('detailWaActive');
                     var formDelete = document.getElementById('formDelete');
 
-                    // 1. RESET TAMPILAN (Sembunyikan semua dulu)
+                    // 1. RESET TAMPILAN
                     actionButtons.style.display = 'none'; 
                     notOwnerAlert.style.display = 'none'; 
                     notOwnerAlert.innerHTML = '';
                     detailWaActive.style.display = 'none';
                     btnOpenEdit.onclick = null;
-                    formDelete.action = "javascript:void(0);"; // Matikan form hapus sementara
+                    formDelete.action = "javascript:void(0);";
 
-                    // Isi Data Modal
                     document.getElementById('detailTitle').innerText = event.title;
                     document.getElementById('detailLocation').innerText = props.location || '-';
                     document.getElementById('detailDesc').innerText = props.description || 'Tidak ada deskripsi.';
@@ -349,22 +401,19 @@
 
                     var wrapper = document.getElementById('detailParticipantsWrapper'); wrapper.innerHTML = ''; 
                     var pData = props.participants; 
-                    if(Array.isArray(pData)) { pData.forEach(p => { let b = document.createElement('span'); b.className='badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle py-2 px-3 fw-normal'; b.innerText=p; wrapper.appendChild(b); }); } 
-                    else if (pData) { let b = document.createElement('span'); b.className='badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle py-2 px-3 fw-normal'; b.innerText=pData; wrapper.appendChild(b); } 
+                    if(Array.isArray(pData)) { pData.forEach(p => { let b = document.createElement('span'); b.className='badge rounded-pill bg-success-subtle text-success border border-success-subtle py-2 px-3 fw-normal'; b.innerText=p; wrapper.appendChild(b); }); } 
+                    else if (pData) { let b = document.createElement('span'); b.className='badge rounded-pill bg-success-subtle text-success border border-success-subtle py-2 px-3 fw-normal'; b.innerText=pData; wrapper.appendChild(b); } 
                     else { wrapper.innerText = '-'; }
                     
                     var start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                     var end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                     document.getElementById('detailTime').innerText = event.start.toLocaleDateString('id-ID', { dateStyle: 'full' }) + ' • ' + start + (end ? ' - ' + end : '');
                     
-                    // 2. LOGIKA TAMPILKAN WA
                     if (props.is_whatsapp_notify == 1) {
                         detailWaActive.style.display = 'flex';
                     }
                     
-                    // 3. LOGIKA HAK AKSES (STRICT)
                     if (props.can_edit) {
-                        // === JIKA PEMILIK (Bisa Edit) ===
                         actionButtons.style.display = 'flex'; 
                         
                         var baseUrl = "{{ url('/agenda') }}"; 
@@ -402,8 +451,7 @@
                             new bootstrap.Modal(document.getElementById('editModal')).show();
                         };
                     } else {
-                        // === JIKA BUKAN PEMILIK (Tampilkan Alert) ===
-                        notOwnerAlert.style.display = 'flex'; // Gunakan flex agar icon & text rata
+                        notOwnerAlert.style.display = 'flex'; 
                         notOwnerAlert.innerHTML = '<i class="bi bi-lock-fill me-2 fs-5"></i><div>Anda hanya bisa melihat agenda ini (Dibuat oleh <strong>' + creatorName + '</strong>).</div>';
                     }
 

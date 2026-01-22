@@ -11,10 +11,8 @@ class AgendaController extends Controller
 {
     public function dashboard()
     {
-        // 1. Tentukan Waktu Sekarang (WIB)
         $now = Carbon::now('Asia/Jakarta');
 
-        // 2. Hitung Statistik
         $agendaToday = Agenda::whereDate('start_time', $now->toDateString())->count();
         $agendaMonth = Agenda::whereMonth('start_time', $now->month)
                              ->whereYear('start_time', $now->year)
@@ -22,11 +20,9 @@ class AgendaController extends Controller
         $agendaUpcoming = Agenda::where('start_time', '>', $now)->count();
         $agendaArchived = Agenda::where('end_time', '<', $now)->count();
 
-        // 3. UPDATE: Daftar Agenda Ditambahkan HARI INI (Unlimited)
         $recentAgendas = Agenda::with('user')
-                               ->whereDate('created_at', $now->toDateString()) // Filter: Dibuat Hari Ini
-                               ->orderBy('created_at', 'desc') // Urutkan dari yang terbaru
-                               // ->take(5) <--- INI DIHAPUS agar tidak terbatas 5
+                               ->whereDate('created_at', $now->toDateString())
+                               ->orderBy('created_at', 'desc')
                                ->get();
 
         return view('dashboard', compact(
@@ -94,9 +90,30 @@ class AgendaController extends Controller
         $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
         $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
 
+        // --- LOGIKA CEK BENTROK (OVERLAP) ---
+        if ($request->type == 'meeting_room') {
+            if (!$end_datetime) {
+                return redirect()->back()->with('error', 'Jam selesai wajib diisi untuk booking ruangan.');
+            }
+
+            $isBooked = Agenda::where('location', $request->location)
+                ->where('type', 'meeting_room')
+                ->where(function ($query) use ($start_datetime, $end_datetime) {
+                    $query->where(function ($q) use ($start_datetime, $end_datetime) {
+                        $q->where('start_time', '<', $end_datetime)
+                          ->where('end_time', '>', $start_datetime);
+                    });
+                })
+                ->exists();
+
+            if ($isBooked) {
+                return redirect()->back()->with('error', 'Gagal! Ruangan ' . $request->location . ' sudah terpakai di jam tersebut.');
+            }
+        }
+
         Agenda::create([
             'user_id' => Auth::id(),
-            'type' => 'general',
+            'type' => $request->type ?? 'general',
             'title' => $request->title,
             'start_time' => $start_datetime,
             'end_time' => $end_datetime,
@@ -106,7 +123,9 @@ class AgendaController extends Controller
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
         ]);
 
-        return redirect()->route('agenda.index')->with('success', 'Agenda berhasil ditambahkan');
+        // PERBAIKAN DI SINI: Gunakan 'meeting-room.index' (pakai dash/strip)
+        $route = ($request->type == 'meeting_room') ? 'meeting-room.index' : 'agenda.index';
+        return redirect()->route($route)->with('success', 'Agenda berhasil ditambahkan');
     }
 
     public function update(Request $request, string $id)
@@ -127,6 +146,27 @@ class AgendaController extends Controller
         $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
         $end_datetime = $request->end_hour ? $request->date . ' ' . $request->end_hour . ':00' : null;
 
+        if ($request->type == 'meeting_room') {
+            if (!$end_datetime) {
+                return redirect()->back()->with('error', 'Jam selesai wajib diisi untuk booking ruangan.');
+            }
+
+            $isBooked = Agenda::where('location', $request->location)
+                ->where('type', 'meeting_room')
+                ->where('id', '!=', $id)
+                ->where(function ($query) use ($start_datetime, $end_datetime) {
+                    $query->where(function ($q) use ($start_datetime, $end_datetime) {
+                        $q->where('start_time', '<', $end_datetime)
+                          ->where('end_time', '>', $start_datetime);
+                    });
+                })
+                ->exists();
+
+            if ($isBooked) {
+                return redirect()->back()->with('error', 'Gagal Update! Ruangan ' . $request->location . ' sudah terpakai di jam tersebut.');
+            }
+        }
+
         $agenda->update([
             'title' => $request->title,
             'start_time' => $start_datetime,
@@ -135,10 +175,12 @@ class AgendaController extends Controller
             'participants' => $request->participants ?? [],
             'description' => $request->description,
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
-            'notification_sent' => false,
+            'notification_sent' => false, 
         ]);
 
-        return redirect()->route('agenda.index')->with('success', 'Agenda berhasil diperbarui');
+        // PERBAIKAN DI SINI JUGA
+        $route = ($request->type == 'meeting_room') ? 'meeting-room.index' : 'agenda.index';
+        return redirect()->route($route)->with('success', 'Agenda berhasil diperbarui');
     }
 
     public function destroy(string $id)
@@ -149,8 +191,11 @@ class AgendaController extends Controller
             return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk menghapus agenda ini.');
         }
 
+        $type = $agenda->type; 
         $agenda->delete();
 
-        return redirect()->back()->with('success', 'Agenda berhasil dihapus');
+        // DAN DI SINI
+        $route = ($type == 'meeting_room') ? 'meeting-room.index' : 'agenda.index';
+        return redirect()->route($route)->with('success', 'Agenda berhasil dihapus');
     }
 }

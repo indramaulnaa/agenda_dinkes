@@ -36,28 +36,21 @@ class SendAgendaReminders extends Command
     {
         $token = env('FONNTE_TOKEN');
         
-        // 1. Ambil List Peserta dari Database
-        // Karena sekarang "Peserta" berfungsi ganda sebagai target WA
         $participants = $agenda->participants ?? []; 
         
         if (empty($participants)) {
             return; 
         }
 
-        // 2. Ambil Mapping Nama Grup -> ID WA dari Config
         $groupConfig = config('whatsapp.groups');
 
-        // 3. Loop setiap peserta yang dipilih
         foreach ($participants as $participantName) {
-            // Cek apakah nama peserta ini ada di config WA (artinya dia adalah grup target)
             if (isset($groupConfig[$participantName]) && !empty($groupConfig[$participantName])) {
                 
                 $targetID = $groupConfig[$participantName];
                 
-                // Kirim Pesan ke ID Grup tersebut
                 $this->sendMessage($token, $targetID, $agenda, $participantName);
-                // --- TAMBAHAN: Jeda 3 detik agar tidak dianggap spam ---
-                sleep(3);
+                sleep(3); // Jeda anti-spam
             }
         }
     }
@@ -65,17 +58,25 @@ class SendAgendaReminders extends Command
     private function sendMessage($token, $targetID, $agenda, $groupName)
     {
         try {
+            // Format Waktu Indonesia
             $hari = Carbon::parse($agenda->start_time)->locale('id')->isoFormat('dddd, D MMMM Y');
             $jam = Carbon::parse($agenda->start_time)->format('H:i') . ' WIB';
-            $judulPesan = ($agenda->type == 'meeting_room') ? "RUANGAN AKAN DIGUNAKAN" : "PENGINGAT AGENDA";
+            
+            // Judul Dinamis (Agenda vs Booking Ruangan)
+            $judulPesan = ($agenda->type == 'meeting_room') ? "PENGINGAT RUANGAN" : "PENGINGAT AGENDA";
 
-            $message = "🔔 *{$judulPesan} (30 Menit Lagi)* 🔔\n"
+            // Format Pesan Baru Sesuai Request
+            $message = "🔔 *{$judulPesan} (30 Menit Lagi)* \n"
                 . "_Pesan untuk: {$groupName}_\n\n"
-                . "📌 *Kegiatan:* {$agenda->title}\n"
-                . "📅 *Hari:* {$hari}\n"
-                . "⏰ *Jam:* {$jam}\n"
-                . "📍 *Lokasi:* {$agenda->location}\n"
-                . "👥 *Peserta:* " . implode(', ', $agenda->participants ?? ['-']) . "\n\n"
+                . "Yth. Bapak/Ibu,\n"
+                . "Diingatkan bahwa kegiatan berikut akan dimulai dalam 30 menit:\n\n"
+                . "*Kegiatan:* {$agenda->title}\n"
+                . "*Hari:* {$hari}\n"
+                . "*Jam:* {$jam}\n"
+                . "*Lokasi:* {$agenda->location}\n"
+                . "*Peserta:* " . implode(', ', $agenda->participants ?? ['-']) . "\n\n"
+                . "*Detail Agenda:*\n"
+                . ($agenda->description ? $agenda->description : "-") . "\n\n"
                 . "Mohon persiapan kehadirannya.";
 
             Http::withHeaders(['Authorization' => $token])

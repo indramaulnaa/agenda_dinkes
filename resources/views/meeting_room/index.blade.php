@@ -34,11 +34,8 @@
         /* Tombol Aktif (ORANYE Kapsul) */
         .fc-dayGridMonth-button.fc-button-active, 
         .fc-listMonth-button.fc-button-active {
-            color: #fd7e14 !important;
-            background-color: #fff7ed !important;
-            border-radius: 50px !important;
-            padding: 8px 24px !important;
-            font-weight: 800 !important;
+            color: #fd7e14 !important; background-color: #fff7ed !important;
+            border-radius: 50px !important; padding: 8px 24px !important; font-weight: 800 !important;
         }
         .fc-today-button {
             color: #111827 !important; background-color: #f3f4f6 !important;
@@ -91,13 +88,44 @@
         }
         .btn-custom-orange:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(253, 126, 20, 0.4); color: white; }
 
-        /* MODAL STYLING */
+        /* --- STYLE MODAL DETAIL MODERN --- */
+        .modal-content { border-radius: 20px; border: none; overflow: hidden; }
         .detail-label-small { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .detail-text-content { font-size: 1rem; color: #1f2937; font-weight: 600; }
-        .desc-box { background: #f9fafb; padding: 20px; border-radius: 12px; border: 1px solid #f3f4f6; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
-        .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+        .detail-text-content { font-size: 1.05rem; color: #1f2937; font-weight: 600; }
+        .detail-section { margin-bottom: 25px; display: flex; gap: 18px; align-items: center; }
+        
+        /* ICON MODERN (Lingkaran + Gradient) */
+        .detail-icon-box {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .detail-icon-box:hover { transform: translateY(-3px) scale(1.05); }
+
+        /* Varian Warna Icon */
+        .icon-time { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7; }
+        .icon-loc { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; }
+        .icon-people { background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); color: #ea580c; } /* Oranye utk Meeting Room */
+
+        .desc-box { background: #f9fafb; padding: 20px; border-radius: 16px; border: 1px solid #f3f4f6; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
+
+        /* MODAL & FORM UMUM */
         .form-label-bold { font-weight: 600; font-size: 0.9rem; color: #374151; }
         .select2-container .select2-selection--multiple { min-height: 38px; border: 1px solid #ced4da; border-radius: 0.375rem; }
+
+        /* SELECT2 HIJAU KOTAK TUMPUL */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #198754 !important; border: none !important; color: white !important;
+            border-radius: 8px !important; padding: 5px 10px !important; font-size: 0.85rem !important; font-weight: 600 !important; margin-top: 6px !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white !important; border-right: 1px solid rgba(255,255,255,0.3) !important; margin-right: 5px !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #146c43 !important; }
     </style>
 
     <div class="d-flex justify-content-end mb-4">
@@ -118,22 +146,51 @@
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
-                <div class="modal-header border-bottom-0 pb-0" style="padding: 20px 25px;">
+                <div class="modal-header border-bottom-0 pb-0" style="padding: 25px 30px 10px;">
                     <div class="d-flex align-items-center text-muted small"><i class="bi bi-building me-1"></i> Detail Booking</div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="opacity: 0.5;"></button>
                 </div>
-                <div class="modal-body" style="padding: 0 25px 25px 25px;">
-                    <h3 id="detailTitle" class="fw-bold text-dark mb-1 mt-1" style="line-height: 1.3;"></h3>
-                    <div class="text-secondary small mb-4">Dibuat oleh: <span id="detailCreator" class="fw-bold text-danger"></span></div>
+                
+                <div class="modal-body" style="padding: 0 30px 30px 30px;">
+                    <h3 id="detailTitle" class="fw-bold text-dark mb-1 mt-0" style="line-height: 1.3; font-size: 1.6rem;"></h3>
+                    <div class="text-secondary small mb-4">
+                        Dibuat oleh: <span id="detailCreator" class="fw-bold text-danger"></span>
+                    </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-12"><div class="detail-label-small">Waktu Penggunaan</div><div id="detailTime" class="detail-text-content"></div></div>
-                        <div class="col-12"><div class="detail-label-small">Ruangan</div><div id="detailLocation" class="detail-text-content"></div></div>
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="detail-section">
+                                <div class="detail-icon-box icon-time">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="detail-label-small">Waktu Penggunaan</div>
+                                    <div id="detailTime" class="detail-text-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="detail-section">
+                                <div class="detail-icon-box icon-loc">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="detail-label-small">Ruangan</div>
+                                    <div id="detailLocation" class="detail-text-content"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-4">
-                        <div class="detail-label-small mb-2">Bidang / Peserta</div>
-                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2"></div>
+                        <div class="d-flex align-items-center mb-3 gap-3">
+                             <div class="detail-icon-box icon-people" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="detail-label-small mb-0" style="font-size: 0.85rem;">Bidang / Peserta</div>
+                        </div>
+                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2 ps-2"></div>
                     </div>
 
                     <div class="desc-box mb-3" id="detailDesc"></div>
@@ -141,10 +198,14 @@
                     <div id="notOwnerAlert" class="alert alert-warning border-0 small align-items-center mb-3" style="display:none; border-radius: 12px; background-color: #fff3cd; color: #856404; border-left: 5px solid #ffc107;"></div>
 
                     <div id="actionButtons" class="d-flex gap-2 mt-4" style="display: none;">
-                        <button id="btnOpenEdit" class="btn btn-warning text-white fw-bold py-2 flex-grow-1 shadow-sm rounded-pill"><i class="bi bi-pencil-square me-2"></i> Edit Booking</button>
+                        <button id="btnOpenEdit" class="btn btn-warning text-white fw-bold py-2 flex-grow-1 shadow-sm rounded-pill">
+                            <i class="bi bi-pencil-square me-2"></i> Edit Booking
+                        </button>
                         <form id="formDelete" action="javascript:void(0);" method="POST" class="flex-grow-1">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger fw-bold w-100 py-2 shadow-sm rounded-pill" onclick="return confirm('Batalkan booking ruangan ini?')"><i class="bi bi-trash me-2"></i> Batalkan</button>
+                            <button type="submit" class="btn btn-danger fw-bold w-100 py-2 shadow-sm rounded-pill" onclick="return confirm('Batalkan booking ruangan ini?')">
+                                <i class="bi bi-trash me-2"></i> Batalkan
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -157,7 +218,7 @@
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold">Booking Ruangan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body pt-0">
-                    <form action="{{ route('agenda.store') }}" method="POST">
+                    <form action="{{ route('meeting-room.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="type" value="meeting_room">
                         
@@ -169,10 +230,9 @@
                             <label class="form-label-bold">Pilih Ruangan <span class="text-danger">*</span></label>
                             <select name="location" class="form-select" required>
                                 <option value="" selected disabled>-- Pilih Ruangan --</option>
-                                <option value="Aula Utama">Aula Utama</option>
-                                <option value="Ruang Rapat A">Ruang Rapat A</option>
-                                <option value="Ruang Rapat B">Ruang Rapat B</option>
-                                <option value="Ruang Zoom Meeting">Ruang Zoom Meeting</option>
+                                <option value="Aula Utama Dinas Kesehatan Lt 2">Aula Utama Dinas Kesehatan Lt 2</option>
+                                <option value="Kepala Dinas Kesehatan Lt 1">Kepala Dinas Kesehatan Lt 1</option>
+                                <option value="Sekertaris Dinas Kesehatan Lt 1">Sekertaris Dinas Kesehatan Lt 1</option>
                             </select>
                         </div>
                         
@@ -180,16 +240,20 @@
                             <label class="form-label-bold">Bidang Pengguna</label>
                             <select name="participants[]" class="form-select select2-create" multiple="multiple" style="width: 100%">
                                 <option value="Sekretariat">Sekretariat</option>
-                                <option value="Bidang Kesmas">Bidang Kesmas</option>
-                                <option value="Bidang P2P">Bidang P2P</option>
-                                <option value="Bidang Yankes">Bidang Yankes</option>
-                                <option value="Bidang SDK">Bidang SDK</option>
+                                <option value="Bidang Kesehatan Masyarakat (Kesmas)">Bidang Kesehatan Masyarakat (Kesmas)</option>
+                                <option value="Bidang Pencegahan & Pengendalian Penyakit (P2P)">Bidang Pencegahan & Pengendalian Penyakit (P2P)</option>
+                                <option value="Bidang Pelayanan Kesehatan (Yankes)">Bidang Pelayanan Kesehatan (Yankes)</option>
+                                <option value="Bidang Sumber Daya Kesehatan (SDK)">Bidang Sumber Daya Kesehatan (SDK)</option>
+                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
                             </select>
                         </div>
 
                         <div class="mb-3"><label class="form-label-bold">Keterangan Tambahan</label><textarea name="description" class="form-control" rows="3"></textarea></div>
                         
-                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-custom-orange">Simpan Booking</button></div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-custom-orange">Simpan Booking</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -212,10 +276,9 @@
                         <div class="mb-3">
                             <label class="form-label-bold">Pilih Ruangan</label>
                             <select id="editLocation" name="location" class="form-select" required>
-                                <option value="Aula Utama">Aula Utama</option>
-                                <option value="Ruang Rapat A">Ruang Rapat A</option>
-                                <option value="Ruang Rapat B">Ruang Rapat B</option>
-                                <option value="Ruang Zoom Meeting">Ruang Zoom Meeting</option>
+                                <option value="Aula Utama Dinas Kesehatan Lt 2">Aula Utama Dinas Kesehatan Lt 2</option>
+                                <option value="Kepala Dinas Kesehatan Lt 1">Kepala Dinas Kesehatan Lt 1</option>
+                                <option value="Sekertaris Dinas Kesehatan Lt 1">Sekertaris Dinas Kesehatan Lt 1</option>
                             </select>
                         </div>
 
@@ -223,15 +286,19 @@
                             <label class="form-label-bold">Bidang Pengguna</label>
                             <select id="editParticipants" name="participants[]" class="form-select select2-edit" multiple="multiple" style="width: 100%">
                                 <option value="Sekretariat">Sekretariat</option>
-                                <option value="Bidang Kesmas">Bidang Kesmas</option>
-                                <option value="Bidang P2P">Bidang P2P</option>
-                                <option value="Bidang Yankes">Bidang Yankes</option>
-                                <option value="Bidang SDK">Bidang SDK</option>
+                                <option value="Bidang Kesehatan Masyarakat (Kesmas)">Bidang Kesehatan Masyarakat (Kesmas)</option>
+                                <option value="Bidang Pencegahan & Pengendalian Penyakit (P2P)">Bidang Pencegahan & Pengendalian Penyakit (P2P)</option>
+                                <option value="Bidang Pelayanan Kesehatan (Yankes)">Bidang Pelayanan Kesehatan (Yankes)</option>
+                                <option value="Bidang Sumber Daya Kesehatan (SDK)">Bidang Sumber Daya Kesehatan (SDK)</option>
+                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
                             </select>
                         </div>
                         <div class="mb-3"><label class="form-label-bold">Keterangan</label><textarea id="editDescription" name="description" class="form-control" rows="3"></textarea></div>
                         
-                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-warning text-white fw-bold">Update Booking</button></div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-warning text-white fw-bold">Update Booking</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -306,7 +373,7 @@
                     }
                 },
 
-                // --- LOGIKA KLIK DETAIL (PERBAIKAN TOTAL) ---
+                // --- LOGIKA KLIK DETAIL ---
                 eventClick: function(info) {
                     var event = info.event;
                     var props = event.extendedProps;
@@ -316,13 +383,11 @@
                     var btnOpenEdit = document.getElementById('btnOpenEdit');
                     var formDelete = document.getElementById('formDelete');
 
-                    // 1. RESET TAMPILAN (Bersih-bersih)
+                    // 1. RESET TAMPILAN
                     actionButtons.style.display = 'none'; 
                     notOwnerAlert.style.display = 'none'; 
                     notOwnerAlert.innerHTML = '';
                     btnOpenEdit.onclick = null;
-                    
-                    // PENTING: Matikan form action
                     formDelete.action = "javascript:void(0);";
 
                     document.getElementById('detailTitle').innerText = event.title;
@@ -344,11 +409,9 @@
                     
                     // 2. LOGIKA HAK AKSES
                     if (props.can_edit) {
-                        // JIKA PEMILIK: Tampilkan Tombol
                         actionButtons.style.display = 'flex'; 
                         
-                        // SET LINK HAPUS YANG BENAR
-                        var baseUrl = "{{ url('/agenda') }}"; 
+                        var baseUrl = "{{ url('/meeting-room') }}"; 
                         if(event.id) {
                             formDelete.action = baseUrl + "/" + event.id;
                         }
@@ -382,7 +445,6 @@
                             new bootstrap.Modal(document.getElementById('editModal')).show();
                         };
                     } else {
-                        // JIKA BUKAN PEMILIK: Tampilkan Alert
                         notOwnerAlert.style.display = 'flex';
                         notOwnerAlert.innerHTML = '<i class="bi bi-lock-fill me-2 fs-5"></i><div>Maaf, Anda tidak memiliki izin untuk mengubah booking ini (Dibuat oleh <strong>' + creatorName + '</strong>).</div>';
                     }

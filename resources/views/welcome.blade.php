@@ -48,19 +48,16 @@
         .fc .fc-icon { font-size: 1.2rem; font-weight: bold; color: #111827; }
 
         /* --- 2. WARNA TOMBOL AKTIF --- */
-        /* Agenda & List (Hijau) */
         .fc-btnAgenda-button.active-mode, 
         body.theme-green .fc-listMonth-button.fc-button-active {
             color: #198754 !important; background-color: #ecfdf5 !important;
             border-radius: 50px !important; padding: 8px 20px !important; font-weight: 800 !important;
         }
-        /* Rooms & List (Oranye) */
         .fc-btnRooms-button.active-mode,
         body.theme-orange .fc-listMonth-button.fc-button-active {
             color: #fd7e14 !important; background-color: #fff7ed !important;
             border-radius: 50px !important; padding: 8px 20px !important; font-weight: 800 !important;
         }
-        /* Today */
         .fc-today-button {
             color: #111827 !important; background-color: #f3f4f6 !important;
             border-radius: 50px !important; padding: 8px 20px !important; margin-right: 5px !important;
@@ -109,22 +106,12 @@
         /* --- 6. LIST VIEW CUSTOMIZATION --- */
         .fc-list-table td { border: none !important; background: transparent !important; }
         .fc-list-day-cushion { background-color: transparent !important; padding-top: 25px !important; }
-        
-        /* HEADER LIST (TANGGAL & HARI) */
-        .fc-list-day-text { 
-            font-size: 1.1rem; font-weight: 800; color: #111827; text-decoration: none !important; 
-        }
-        /* Hari (Senin, Selasa) -> ABU-ABU */
-        .fc-list-day-side-text { 
-            font-weight: 600; color: #9ca3af !important; text-decoration: none !important; font-size: 1rem;
-        }
+        .fc-list-day-text { font-size: 1.1rem; font-weight: 800; color: #111827; text-decoration: none !important; }
+        .fc-list-day-side-text { font-weight: 600; color: #9ca3af !important; text-decoration: none !important; font-size: 1rem; }
         .fc-list-day-cushion a { text-decoration: none !important; pointer-events: none; }
-        
-        /* HIDE DEFAULT ELEMENTS */
         .fc-list-event-time, .fc-list-event-graphic { display: none !important; }
         .fc-list-empty { display: none !important; }
 
-        /* KARTU LIST */
         .agenda-list-card {
             padding: 15px 20px; border-radius: 12px; margin-bottom: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;
@@ -135,25 +122,43 @@
         .list-title { font-weight: 400; font-size: 1rem; }
         .list-loc { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; display: flex; align-items: center; gap: 5px;}
 
-        /* Modal & Footer */
-        .modal-title { font-weight: 800; }
-        .detail-label { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .detail-content { font-size: 1rem; color: #111827; font-weight: 600; }
-        /* Warna putih dengan bayangan agar jelas */
+        /* --- 7. MODAL DETAIL MODERN (DIPERBARUI) --- */
+        .modal-content { border-radius: 20px; border: none; overflow: hidden; }
+        .detail-label-small { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .detail-text-content { font-size: 1.05rem; color: #1f2937; font-weight: 600; }
+        .detail-section { margin-bottom: 25px; display: flex; gap: 18px; align-items: center; }
+        
+        /* --- UPDATE: MODERN ICON BOX --- */
+        .detail-icon-box {
+            width: 52px; height: 52px; /* Sedikit lebih besar */
+            border-radius: 50%; /* Lingkaran penuh */
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; /* Icon lebih besar */
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Efek melayang halus */
+            transition: all 0.3s ease;
+        }
+        .detail-icon-box:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
+
+        /* Tema Hijau (Gradient Modern) */
+        .theme-green .detail-icon-box { 
+            background: linear-gradient(135deg, #d1e7dd 0%, #a8d5c2 100%); 
+            color: #0f5132; 
+        }
+        /* Tema Oranye (Gradient Modern) */
+        .theme-orange .detail-icon-box { 
+            background: linear-gradient(135deg, #ffe5d0 0%, #ffd1b0 100%); 
+            color: #c2410c; 
+        }
+
+        .desc-box { background: #f9fafb; padding: 20px; border-radius: 16px; border: 1px solid #f3f4f6; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
+        
         .footer-link { 
-            text-decoration: none; 
-            color: white !important; 
-            font-weight: 600; 
-            font-size: 0.9rem; 
-            transition: 0.2s; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-decoration: none; color: white !important; font-weight: 600; font-size: 0.9rem; transition: 0.2s; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
-        .footer-link:hover { 
-            color: #198754 !important; 
-            text-decoration: underline;
-        }
-        .btn-close-custom { background-color: #4b5563; border: none; color: white; font-weight: 700; padding: 10px; transition: all 0.3s ease; }
-        .btn-close-custom:hover { background-color: #000000 !important; color: white !important; transform: translateY(-2px); }
+        .footer-link:hover { color: #198754 !important; text-decoration: underline; }
+        .btn-close-custom { background-color: #1f2937; border: none; color: white; font-weight: 700; padding: 12px; transition: all 0.3s ease; font-size: 1rem;}
+        .btn-close-custom:hover { background-color: #000000 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body class="theme-green"> 
@@ -200,27 +205,61 @@
 
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title">Detail Agenda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-bottom-0 pb-0" style="padding: 25px 30px 10px;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="opacity: 0.5;"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <h4 id="detailTitle" class="fw-bold text-success mb-4" style="font-size: 1.4rem;"></h4>
-                    <div class="mb-3"><div class="detail-label">Waktu</div><div id="detailTime" class="detail-content"></div></div>
-                    <div class="mb-3"><div class="detail-label">Lokasi</div><div id="detailLocation" class="detail-content"></div></div>
-                    <div class="mb-3"><div class="detail-label">Peserta</div><div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-1"></div></div>
-                    <div class="bg-light p-3 rounded-3 mt-3"><div class="detail-label mb-1">Catatan</div><div id="detailDesc" class="text-secondary small"></div></div>
+                
+                <div class="modal-body" style="padding: 0 30px 30px 30px;">
+                    <h3 id="detailTitle" class="fw-bold text-dark mb-4 mt-0" style="line-height: 1.3; font-size: 1.75rem;"></h3>
+
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="detail-section">
+                                <div class="detail-icon-box">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="detail-label-small">Waktu Pelaksanaan</div>
+                                    <div id="detailTime" class="detail-text-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="detail-section">
+                                <div class="detail-icon-box">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="detail-label-small">Tempat / Lokasi</div>
+                                    <div id="detailLocation" class="detail-text-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-3 gap-3">
+                             <div class="detail-icon-box" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="detail-label-small mb-0" style="font-size: 0.85rem;">Peserta / Tujuan</div>
+                        </div>
+                        <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2 ps-2"></div>
+                    </div>
+
+                    <div class="desc-box" id="detailDesc"></div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-close-custom w-100" data-bs-dismiss="modal">Tutup</button>
+                
+                <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-close-custom w-100 rounded-pill" data-bs-dismiss="modal">Tutup Detail</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // GLOBAL VARIABLES
         let currentType = 'general';
         const colors = {
             agenda: { even: { bg: '#d1e7dd', text: '#146c43' }, odd:  { bg: '#e0f2fe', text: '#0284c7' } },
@@ -233,52 +272,25 @@
                 initialView: 'dayGridMonth',
                 locale: 'id',
                 
-                // --- CUSTOM BUTTONS ---
                 customButtons: {
-                    btnAgenda: {
-                        text: 'Agenda',
-                        click: function() { loadEvents('general', 'btnAgenda'); }
-                    },
-                    btnRooms: {
-                        text: 'Rooms',
-                        click: function() { loadEvents('meeting_room', 'btnRooms'); }
-                    }
+                    btnAgenda: { text: 'Agenda', click: function() { loadEvents('general', 'btnAgenda'); } },
+                    btnRooms: { text: 'Rooms', click: function() { loadEvents('meeting_room', 'btnRooms'); } }
                 },
 
-                // --- POSISI TOMBOL ---
-                headerToolbar: {
-                    left: 'title',
-                    center: '',
-                    right: 'btnAgenda,btnRooms,listMonth prev,today,next' 
-                },
+                headerToolbar: { left: 'title', center: '', right: 'btnAgenda,btnRooms,listMonth prev,today,next' },
                 buttonText: { list: 'List' }, 
                 events: '{{ route("agenda.feed") }}?type=general',
 
-                // --- 1. FILTER TANGGAL DI LIST (SEMBUNYIKAN YG LEWAT) ---
                 datesSet: function(info) {
                     if (info.view.type === 'listMonth') {
-                        // Set waktu hari ini ke jam 00:00:00 untuk perbandingan murni tanggal
-                        var now = new Date(); 
-                        now.setHours(0,0,0,0); 
-                        
-                        var todayStr = now.getFullYear() + "-" + 
-                                       String(now.getMonth() + 1).padStart(2, '0') + "-" + 
-                                       String(now.getDate()).padStart(2, '0');
+                        var now = new Date(); now.setHours(0,0,0,0);
+                        var todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0');
 
-                        // Loop semua header tanggal
                         document.querySelectorAll('.fc-list-day').forEach(function(header) {
                             var dateStr = header.getAttribute('data-date');
                             if (dateStr) {
-                                // Konversi string tanggal header ke objek Date (jam 00:00:00)
-                                var headerDate = new Date(dateStr); 
-                                headerDate.setHours(0,0,0,0);
-                                
-                                // LOGIKA UTAMA: Jika Tanggal Header < Hari Ini, Hapus/Sembunyikan
-                                if (headerDate < now) { 
-                                    header.style.display = 'none'; 
-                                }
-
-                                // Ubah Judul Hari Ini
+                                var headerDate = new Date(dateStr); headerDate.setHours(0,0,0,0);
+                                if (headerDate < now) { header.style.display = 'none'; }
                                 if (dateStr === todayStr) {
                                     var titleEl = header.querySelector('.fc-list-day-text');
                                     if(titleEl) { 
@@ -291,26 +303,16 @@
                     }
                 },
 
-                // Sembunyikan item event (baris) jika tanggalnya lewat
                 eventDidMount: function(arg) {
                     if (arg.view.type === 'listMonth') {
-                        var now = new Date(); 
-                        now.setHours(0,0,0,0);
-                        
-                        // Cek tanggal event
-                        var eventDate = new Date(arg.event.start);
-                        eventDate.setHours(0,0,0,0);
-
-                        if (eventDate < now) { 
-                            arg.el.style.display = 'none'; 
-                        }
+                        var now = new Date(); now.setHours(0,0,0,0);
+                        var eventDate = new Date(arg.event.start); eventDate.setHours(0,0,0,0);
+                        if (eventDate < now) { arg.el.style.display = 'none'; }
                     }
                 },
 
-                // --- RENDER CONTENT ---
                 eventContent: function(arg) {
                     let event = arg.event;
-                    // Format Jam Mulai - Selesai
                     let start = event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                     let end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                     let timeDisplay = end ? `${start} - ${end}` : start;
@@ -319,25 +321,15 @@
                     let themeSet = (currentType === 'general') ? colors.agenda : colors.rooms;
                     let theme = (eventId % 2 === 0) ? themeSet.even : themeSet.odd;
 
-                    // 1. TAMPILAN LIST (Card Style)
                     if (arg.view.type === 'listMonth') {
                         let card = document.createElement('div');
                         card.className = 'agenda-list-card';
                         card.style.backgroundColor = theme.bg;
                         card.style.color = theme.text;
                         card.style.border = 'none'; 
-
-                        card.innerHTML = `
-                            <div>
-                                <div class="list-time">${timeDisplay}</div> <div class="list-title">${event.title}</div>
-                                <div class="list-loc"><i class="bi bi-geo-alt-fill"></i> ${event.extendedProps.location || '-'}</div>
-                            </div>
-                            <i class="bi bi-chevron-right" style="opacity: 0.5;"></i>
-                        `;
+                        card.innerHTML = `<div><div class="list-time">${timeDisplay}</div> <div class="list-title">${event.title}</div><div class="list-loc"><i class="bi bi-geo-alt-fill"></i> ${event.extendedProps.location || '-'}</div></div><i class="bi bi-chevron-right" style="opacity: 0.5;"></i>`;
                         return { domNodes: [card] };
-                    } 
-                    // 2. TAMPILAN KALENDER (Capsule)
-                    else {
+                    } else {
                         let capsule = document.createElement('div');
                         capsule.className = 'event-capsule';
                         capsule.style.backgroundColor = theme.bg;
@@ -349,23 +341,36 @@
 
                 eventClick: function(info) {
                     var props = info.event.extendedProps;
-                    document.getElementById('detailTitle').innerText = info.event.title;
                     
+                    document.getElementById('detailTitle').innerText = info.event.title;
                     var modalTitle = document.getElementById('detailTitle');
-                    modalTitle.className = currentType === 'general' ? 'fw-bold text-success mb-4' : 'fw-bold text-danger mb-4';
+                    
+                    // Ganti warna judul berdasarkan tipe
+                    modalTitle.className = currentType === 'general' ? 'fw-bold text-success mb-2' : 'fw-bold text-danger mb-2';
 
                     document.getElementById('detailLocation').innerText = props.location || '-';
-                    document.getElementById('detailDesc').innerText = props.description || '-';
+                    document.getElementById('detailDesc').innerText = props.description || 'Tidak ada catatan tambahan.';
                     
-                    var dateStr = info.event.start.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+                    var dateStr = info.event.start.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                     var start = info.event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                     var end = info.event.end ? info.event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
-                    document.getElementById('detailTime').innerText = `${dateStr} • ${start} - ${end}`;
+                    document.getElementById('detailTime').innerText = `${dateStr}\nPukul ${start} - ${end}`;
 
                     var wrapper = document.getElementById('detailParticipantsWrapper'); wrapper.innerHTML = '';
                     var pData = props.participants;
-                    if(Array.isArray(pData)) pData.forEach(p => wrapper.innerHTML += `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 px-2 py-1 rounded-pill small me-1">${p}</span>`);
-                    else wrapper.innerHTML = `<span class="text-muted small">${pData || '-'}</span>`;
+                    
+                    // Style Badge Peserta (Pill Kapsul)
+                    if(Array.isArray(pData)) {
+                        pData.forEach(p => {
+                            let badgeClass = currentType === 'general' 
+                                ? 'bg-success-subtle text-success border-success-subtle' 
+                                : 'bg-danger-subtle text-danger border-danger-subtle';
+                            
+                            wrapper.innerHTML += `<span class="badge rounded-pill border px-3 py-2 fw-normal ${badgeClass}">${p}</span>`;
+                        });
+                    } else {
+                        wrapper.innerHTML = `<span class="text-muted small">${pData || '-'}</span>`;
+                    }
 
                     new bootstrap.Modal(document.getElementById('detailModal')).show();
                 },
@@ -377,28 +382,16 @@
                 document.querySelector('.fc-btnAgenda-button').classList.add('active-mode');
             }, 100);
 
-            // FUNGSI GANTI EVENT & NAVIGASI KEMBALI
             window.loadEvents = function(type, btnId) {
                 currentType = type;
-                
-                // 1. UPDATE CSS BODY
                 if(type === 'general') {
-                    document.body.classList.remove('theme-orange');
-                    document.body.classList.add('theme-green');
+                    document.body.classList.remove('theme-orange'); document.body.classList.add('theme-green');
                 } else {
-                    document.body.classList.remove('theme-green');
-                    document.body.classList.add('theme-orange');
+                    document.body.classList.remove('theme-green'); document.body.classList.add('theme-orange');
                 }
-
-                // 2. PAKSA KEMBALI KE KALENDER (GRID)
-                // Ini memperbaiki masalah tombol List tidak bisa kembali
                 calendar.changeView('dayGridMonth');
-
-                // 3. RELOAD DATA
                 calendar.removeAllEventSources();
                 calendar.addEventSource("{{ route('agenda.feed') }}?type=" + type);
-                
-                // 4. UPDATE TOMBOL AKTIF
                 document.querySelector('.fc-btnAgenda-button').classList.remove('active-mode');
                 document.querySelector('.fc-btnRooms-button').classList.remove('active-mode');
                 document.querySelector('.fc-' + btnId + '-button').classList.add('active-mode');

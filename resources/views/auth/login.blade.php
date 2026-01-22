@@ -12,31 +12,37 @@
         /* --- BACKGROUND SESUAI HALAMAN DEPAN --- */
         body { 
             font-family: 'Inter', sans-serif; 
-            /* Background Gambar */
             background: url('{{ asset('images/bg_dinkes.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             height: 100vh; 
-            position: relative; /* Penting untuk overlay */
+            position: relative;
         }
 
         /* Overlay Putih Transparan */
         body::before {
             content: "";
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(25, 135, 84, 0.85); /* Putih Transparan */
+            background-color: rgba(25, 135, 84, 0.90);
             backdrop-filter: blur(4px);
             z-index: -1;
         }
 
-        .login-card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1); width: 100%; max-width: 400px; border: 1px solid #dcfce7; }
-        .brand-logo { width: 60px; height: 60px; background: #198754; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px; }
+        .login-card { 
+            background: white; padding: 40px; border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1); width: 100%; max-width: 400px; 
+            border: 1px solid #dcfce7; 
+        }
+        
+        .brand-logo-img { 
+            width: 80px; height: auto; margin-bottom: 15px; 
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
         
         /* Fokus Input */
         .form-control:focus { border-color: #198754; box-shadow: none; }
-        /* Supaya border group terlihat rapi saat fokus */
         .input-group:focus-within { box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15); border-radius: 0.375rem; }
         .input-group:focus-within .form-control, 
         .input-group:focus-within .input-group-text { border-color: #198754; }
@@ -44,17 +50,23 @@
         .btn-login { background-color: #198754; border: none; padding: 12px; font-weight: 600; font-size: 1rem; }
         .btn-login:hover { background-color: #146c43; }
 
-        /* Style Tombol Mata */
+        /* Style Tombol Mata Kustom */
         .input-group-text { background-color: white; border-left: 0; cursor: pointer; color: #6c757d; }
         .input-group-text:hover { color: #198754; }
-        /* Fix border input password agar menyatu dengan icon */
         .password-input { border-right: 0; }
+
+        /* --- UPDATE: HILANGKAN TOMBOL MATA BAWAAN BROWSER (Edge/Chrome) --- */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="login-card text-center">
-        <div class="brand-logo"><i class="bi bi-hospital"></i></div>
+        <img src="{{ asset('images/logo_batang.png') }}" alt="Logo Dinas Kesehatan" class="brand-logo-img">
+        
         <h4 class="fw-bold mb-1">Admin Login</h4>
         <p class="text-muted mb-4 small">Silakan masuk untuk mengelola agenda</p>
 
@@ -97,11 +109,9 @@
         const toggleIcon = document.querySelector('#toggleIcon');
 
         togglePassword.addEventListener('click', function (e) {
-            // 1. Ubah tipe input (password <-> text)
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             
-            // 2. Ubah ikon mata (eye <-> eye-slash)
             toggleIcon.classList.toggle('bi-eye');
             toggleIcon.classList.toggle('bi-eye-slash');
         });
