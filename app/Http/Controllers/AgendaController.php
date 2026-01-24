@@ -123,9 +123,14 @@ class AgendaController extends Controller
             'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
         ]);
 
-        // PERBAIKAN DI SINI: Gunakan 'meeting-room.index' (pakai dash/strip)
-        $route = ($request->type == 'meeting_room') ? 'meeting-room.index' : 'agenda.index';
-        return redirect()->route($route)->with('success', 'Agenda berhasil ditambahkan');
+        // --- UPDATE: Notifikasi Berbeda untuk Agenda vs Booking Room ---
+        if ($request->type == 'meeting_room') {
+            return redirect()->route('meeting-room.index')
+                ->with('success', 'Booking Ruangan berhasil ditambahkan');
+        }
+
+        return redirect()->route('agenda.index')
+            ->with('success', 'Agenda berhasil ditambahkan');
     }
 
     public function update(Request $request, string $id)
@@ -178,9 +183,14 @@ class AgendaController extends Controller
             'notification_sent' => false, 
         ]);
 
-        // PERBAIKAN DI SINI JUGA
-        $route = ($request->type == 'meeting_room') ? 'meeting-room.index' : 'agenda.index';
-        return redirect()->route($route)->with('success', 'Agenda berhasil diperbarui');
+        // --- UPDATE: Notifikasi Berbeda untuk Agenda vs Booking Room ---
+        if ($request->type == 'meeting_room') {
+            return redirect()->route('meeting-room.index')
+                ->with('success', 'Booking Room berhasil diperbarui');
+        }
+
+        return redirect()->route('agenda.index')
+            ->with('success', 'Agenda berhasil diperbarui');
     }
 
     public function destroy(string $id)
@@ -194,8 +204,13 @@ class AgendaController extends Controller
         $type = $agenda->type; 
         $agenda->delete();
 
-        // DAN DI SINI
-        $route = ($type == 'meeting_room') ? 'meeting-room.index' : 'agenda.index';
-        return redirect()->route($route)->with('success', 'Agenda berhasil dihapus');
+        // --- UPDATE: Notifikasi Berbeda saat Hapus ---
+        if ($type == 'meeting_room') {
+            return redirect()->route('meeting-room.index')
+                ->with('success', 'Booking Room berhasil dihapus');
+        }
+
+        return redirect()->route('agenda.index')
+            ->with('success', 'Agenda berhasil dihapus');
     }
 }

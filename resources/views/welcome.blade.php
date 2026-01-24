@@ -143,7 +143,7 @@
         /* Tema Hijau (Gradient Modern) */
         .theme-green .detail-icon-box { 
             background: linear-gradient(135deg, #d1e7dd 0%, #a8d5c2 100%); 
-            color: #0f5132; 
+            color: #0f5122; 
         }
         /* Tema Oranye (Gradient Modern) */
         .theme-orange .detail-icon-box { 
@@ -197,7 +197,7 @@
         </div>
         
         <div class="text-center mb-5">
-            <a href="https://www.linkedin.com/in/indra-maulana-a33334250/" target="_blank" class="footer-link">
+            <a href="www.linkedin.com/in/indramaulanahasan" target="_blank" class="footer-link">
                 &copy; 2026 Dinas Kesehatan - Magang UNNES
             </a>
         </div>
