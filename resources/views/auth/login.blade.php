@@ -12,7 +12,7 @@
         /* --- BACKGROUND SESUAI HALAMAN DEPAN --- */
         body { 
             font-family: 'Inter', sans-serif; 
-            background: url('{{ asset('images/bg_dinkes.jpg') }}') no-repeat center center fixed;
+            background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             display: flex; 
             align-items: center; 

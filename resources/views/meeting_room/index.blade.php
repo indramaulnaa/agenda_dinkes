@@ -321,7 +321,7 @@
                 initialView: 'dayGridMonth',
                 locale: 'id',
                 headerToolbar: { left: 'title', center: '', right: 'dayGridMonth,listMonth prev,today,next' },
-                buttonText: { dayGridMonth: 'Rooms', listMonth: 'List', today: 'Hari Ini' },
+                buttonText: { dayGridMonth: 'Rooms', listMonth: 'List', today: 'Today' },
                 events: '{{ route("agenda.feed") }}?type=meeting_room', 
 
                 datesSet: function(info) {

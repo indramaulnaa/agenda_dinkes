@@ -159,6 +159,42 @@
         .footer-link:hover { color: #198754 !important; text-decoration: underline; }
         .btn-close-custom { background-color: #1f2937; border: none; color: white; font-weight: 700; padding: 12px; transition: all 0.3s ease; font-size: 1rem;}
         .btn-close-custom:hover { background-color: #000000 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    
+        /* --- KHUSUS TAMPILAN HP (MOBILE RESPONSIVE) --- */
+        @media (max-width: 768px) {
+            /* 1. Header & Logo lebih ringkas */
+            .brand-logo img { height: 35px; margin-right: 8px; }
+            .brand-text h5 { font-size: 0.95rem; }
+            .brand-text p { font-size: 0.7rem; }
+            
+            /* 2. Container Kalender lebih rapat ke tepi */
+            .calendar-container { padding: 15px; border-radius: 16px; margin-top: 20px; }
+            
+            /* 3. Toolbar Kalender Disusun Vertikal (Atas-Bawah) */
+            .fc-header-toolbar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center !important;
+            }
+            
+            .fc-toolbar-chunk {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+                width: 100%;
+            }
+
+            /* 4. Ukuran Font Judul & Tombol Dikecilkan */
+            .fc-toolbar-title { font-size: 1.3rem !important; margin-bottom: 5px; }
+            .fc .fc-button {
+                padding: 6px 12px !important;
+                font-size: 0.8rem !important; /* Huruf tombol lebih kecil */
+            }
+            
+            /* 5. Sembunyikan teks 'List' jadi ikon saja di HP (Opsional, biar hemat tempat) */
+            /* .fc-listMonth-button { ... } */
+        }
     </style>
 </head>
 <body class="theme-green"> 
@@ -189,7 +225,7 @@
     <div class="container" style="margin-top: 100px;">
         <div class="text-center mb-4">
             <h2 class="fw-bold text-white mb-1" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Jadwal Kegiatan</h2>
-            <p class="text-white mb-0" style="text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Agenda resmi kegiatan Dinas Kesehatan bulan ini</p>
+            <p class="text-white mb-0" style="text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Agenda Resmi kegiatan Dinas Kesehatan</p>
         </div>
 
         <div class="calendar-container">
@@ -197,7 +233,7 @@
         </div>
         
         <div class="text-center mb-5">
-            <a href="www.linkedin.com/in/indramaulanahasan" target="_blank" class="footer-link">
+            <a href="https://www.linkedin.com/in/indramaulanahasan" target="_blank" class="footer-link">
                 &copy; 2026 Dinas Kesehatan - Magang UNNES
             </a>
         </div>
@@ -244,7 +280,7 @@
                              <div class="detail-icon-box" style="width: 40px; height: 40px; font-size: 1.2rem;">
                                 <i class="bi bi-people-fill"></i>
                             </div>
-                            <div class="detail-label-small mb-0" style="font-size: 0.85rem;">Peserta / Tujuan</div>
+                            <div class="detail-label-small mb-0" style="font-size: 0.85rem;">Peserta</div>
                         </div>
                         <div id="detailParticipantsWrapper" class="d-flex flex-wrap gap-2 ps-2"></div>
                     </div>
@@ -253,7 +289,7 @@
                 </div>
                 
                 <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-close-custom w-100 rounded-pill" data-bs-dismiss="modal">Tutup Detail</button>
+                    <button type="button" class="btn btn-close-custom w-100 rounded-pill" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>

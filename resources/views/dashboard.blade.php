@@ -135,7 +135,7 @@
         <div class="stat-card card-purple">
             <div>
                 <div class="stat-number">{{ $agendaArchived }}</div>
-                <div class="stat-label">Arsip / Selesai</div>
+                <div class="stat-label">Arsip</div>
             </div>
             <div class="icon-box bg-soft-purple">
                 <i class="bi bi-archive"></i>
