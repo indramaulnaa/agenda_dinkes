@@ -241,15 +241,18 @@
                         <div class="mb-3"><label class="form-label-bold">Tempat/Lokasi <span class="text-danger">*</span></label><input type="text" name="location" class="form-control" placeholder="Masukkan lokasi kegiatan" required></div>
                         <div class="mb-3">
                             <label class="form-label-bold">Peserta & Tujuan WA <span class="text-danger">*</span></label>
+                            
                             <select name="participants[]" class="form-select select2-create" multiple="multiple" style="width: 100%" required>
                                 <option value="Seluruh Pegawai Dinas Kesehatan">Seluruh Pegawai Dinas Kesehatan</option>
-                                <option value="Sekretariat">Sekretariat</option>
+                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
                                 <option value="Bidang Kesehatan Masyarakat (Kesmas)">Bidang Kesehatan Masyarakat (Kesmas)</option>
                                 <option value="Bidang Pencegahan & Pengendalian Penyakit (P2P)">Bidang Pencegahan & Pengendalian Penyakit (P2P)</option>
                                 <option value="Bidang Pelayanan Kesehatan (Yankes)">Bidang Pelayanan Kesehatan (Yankes)</option>
-                                <option value="Bidang Sumber Daya Kesehatan (SDK)">Bidang Sumber Daya Kesehatan (SDK)</option>
-                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
+                                <option value="Subbagian Umum & Kepegawaian">Subbagian Umum & Kepegawaian</option>
+                                <option value="Subbagian Program & Keuangan">Subbagian Program & Keuangan</option>
+                                <option value="Puskesmas">Puskesmas</option>
                             </select>
+                            
                             <div class="form-text small text-muted">Jika Notifikasi WA aktif, pesan akan dikirim ke grup sesuai pilihan ini.</div>
                         </div>
                         <div class="mb-3"><label class="form-label-bold">Detail Agenda</label><textarea name="description" class="form-control" rows="3" placeholder="Masukkan detail agenda kegiatan (opsional)"></textarea></div>
@@ -281,15 +284,18 @@
                         <div class="mb-3"><label class="form-label-bold">Tempat/Lokasi <span class="text-danger">*</span></label><input type="text" id="editLocation" name="location" class="form-control" required></div>
                         <div class="mb-3">
                             <label class="form-label-bold">Peserta & Tujuan WA <span class="text-danger">*</span></label>
+                            
                             <select id="editParticipants" name="participants[]" class="form-select select2-edit" multiple="multiple" style="width: 100%" required>
                                 <option value="Seluruh Pegawai Dinas Kesehatan">Seluruh Pegawai Dinas Kesehatan</option>
-                                <option value="Sekretariat">Sekretariat</option>
+                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
                                 <option value="Bidang Kesehatan Masyarakat (Kesmas)">Bidang Kesehatan Masyarakat (Kesmas)</option>
                                 <option value="Bidang Pencegahan & Pengendalian Penyakit (P2P)">Bidang Pencegahan & Pengendalian Penyakit (P2P)</option>
                                 <option value="Bidang Pelayanan Kesehatan (Yankes)">Bidang Pelayanan Kesehatan (Yankes)</option>
-                                <option value="Bidang Sumber Daya Kesehatan (SDK)">Bidang Sumber Daya Kesehatan (SDK)</option>
-                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
+                                <option value="Subbagian Umum & Kepegawaian">Subbagian Umum & Kepegawaian</option>
+                                <option value="Subbagian Program & Keuangan">Subbagian Program & Keuangan</option>
+                                <option value="Puskesmas">Puskesmas</option>
                             </select>
+
                         </div>
                         <div class="mb-3"><label class="form-label-bold">Detail Agenda</label><textarea id="editDescription" name="description" class="form-control" rows="3"></textarea></div>
                         <div class="wa-toggle-card mb-4">

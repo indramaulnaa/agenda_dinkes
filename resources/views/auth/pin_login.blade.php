@@ -36,6 +36,20 @@
             transition: 0.3s;
         }
         .btn-enter:hover { background: #146c43; transform: scale(1.02); }
+
+        /* --- TAMBAHAN STYLE UNTUK FOOTER LINK --- */
+        .footer-link {
+            font-size: 0.7rem; 
+            color: #adb5bd; /* Warna abu-abu halus */
+            text-decoration: none; 
+            display: block; 
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .footer-link:hover { 
+            color: #198754; /* Berubah hijau saat di-hover */
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -58,7 +72,11 @@
         </form>
         
         <div class="mt-4 pt-3 border-top">
-            <a href="{{ route('login') }}" class="text-decoration-none small text-secondary">Login sebagai Admin</a>
+            <a href="{{ route('login') }}" class="text-decoration-none small text-secondary fw-bold">Login sebagai Admin</a>
+
+            <a href="https://www.linkedin.com/in/indramaulanahasan" target="_blank" class="footer-link">
+                &copy; 2026 Dinas Kesehatan - Magang UNNES
+            </a>
         </div>
     </div>
 
