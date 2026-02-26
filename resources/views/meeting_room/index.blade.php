@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Meeting Room')
-@section('page_title', 'Meeting Room')
+@section('title', 'Booking Ruangan')
+@section('page_title', 'Booking Room')
 @section('page_subtitle', 'Kelola jadwal penggunaan ruang rapat dinas')
 
 @section('content')
@@ -115,17 +115,18 @@
 
         /* MODAL & FORM UMUM */
         .form-label-bold { font-weight: 600; font-size: 0.9rem; color: #374151; }
+        .wa-toggle-card { background: #ffedd5; border: 1px solid #fed7aa; border-radius: 8px; padding: 15px; display: flex; align-items: center; justify-content: space-between;}
         .select2-container .select2-selection--multiple { min-height: 38px; border: 1px solid #ced4da; border-radius: 0.375rem; }
 
-        /* SELECT2 HIJAU KOTAK TUMPUL */
+        /* SELECT2 ORANYE KOTAK TUMPUL (Agar serasi dengan Meeting Room) */
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #198754 !important; border: none !important; color: white !important;
+            background-color: #fd7e14 !important; border: none !important; color: white !important;
             border-radius: 8px !important; padding: 5px 10px !important; font-size: 0.85rem !important; font-weight: 600 !important; margin-top: 6px !important;
         }
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
             color: white !important; border-right: 1px solid rgba(255,255,255,0.3) !important; margin-right: 5px !important;
         }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #146c43 !important; }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #d9480f !important; }
     </style>
 
     <div class="d-flex justify-content-end mb-4">
@@ -197,6 +198,10 @@
                     
                     <div id="notOwnerAlert" class="alert alert-warning border-0 small align-items-center mb-3" style="display:none; border-radius: 12px; background-color: #fff3cd; color: #856404; border-left: 5px solid #ffc107;"></div>
 
+                    <div id="detailWaActive" class="text-success small fw-bold mb-3 align-items-center" style="display:none;">
+                        <i class="bi bi-whatsapp fs-5 me-2"></i> Notifikasi WhatsApp Aktif
+                    </div>
+
                     <div id="actionButtons" class="d-flex gap-2 mt-4" style="display: none;">
                         <button id="btnOpenEdit" class="btn btn-warning text-white fw-bold py-2 flex-grow-1 shadow-sm rounded-pill">
                             <i class="bi bi-pencil-square me-2"></i> Edit Booking
@@ -237,19 +242,27 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label-bold">Bidang Pengguna</label>
+                            <label class="form-label-bold">Peserta & Tujuan WA</label>
                             <select name="participants[]" class="form-select select2-create" multiple="multiple" style="width: 100%">
-                                <option value="Sekretariat">Sekretariat</option>
+                                <option value="Seluruh Pegawai Dinas Kesehatan">Seluruh Pegawai Dinas Kesehatan</option>
+                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
                                 <option value="Bidang Kesehatan Masyarakat (Kesmas)">Bidang Kesehatan Masyarakat (Kesmas)</option>
                                 <option value="Bidang Pencegahan & Pengendalian Penyakit (P2P)">Bidang Pencegahan & Pengendalian Penyakit (P2P)</option>
                                 <option value="Bidang Pelayanan Kesehatan (Yankes)">Bidang Pelayanan Kesehatan (Yankes)</option>
-                                <option value="Bidang Sumber Daya Kesehatan (SDK)">Bidang Sumber Daya Kesehatan (SDK)</option>
-                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
+                                <option value="Subbagian Umum & Kepegawaian">Subbagian Umum & Kepegawaian</option>
+                                <option value="Subbagian Program & Keuangan">Subbagian Program & Keuangan</option>
+                                <option value="Puskesmas">Puskesmas</option>
                             </select>
+                            <div class="form-text small text-muted">Jika Notifikasi WA aktif, pesan akan dikirim ke grup sesuai pilihan ini.</div>
                         </div>
 
                         <div class="mb-3"><label class="form-label-bold">Keterangan Tambahan</label><textarea name="description" class="form-control" rows="3"></textarea></div>
                         
+                        <div class="wa-toggle-card mb-4">
+                            <div><div class="fw-bold text-danger"><i class="bi bi-whatsapp"></i> Kirim Notifikasi WhatsApp</div><div class="small text-secondary">Pesan dikirim otomatis 30 menit sebelum acara</div></div>
+                            <div class="form-check form-switch"><input class="form-check-input fs-4" type="checkbox" name="is_whatsapp_notify" value="1"></div>
+                        </div>
+
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
                             <button type="submit" class="btn btn-custom-orange">Simpan Booking</button>
@@ -285,16 +298,23 @@
                         <div class="mb-3">
                             <label class="form-label-bold">Bidang Pengguna</label>
                             <select id="editParticipants" name="participants[]" class="form-select select2-edit" multiple="multiple" style="width: 100%">
-                                <option value="Sekretariat">Sekretariat</option>
+                                <option value="Seluruh Pegawai Dinas Kesehatan">Seluruh Pegawai Dinas Kesehatan</option>
+                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
                                 <option value="Bidang Kesehatan Masyarakat (Kesmas)">Bidang Kesehatan Masyarakat (Kesmas)</option>
                                 <option value="Bidang Pencegahan & Pengendalian Penyakit (P2P)">Bidang Pencegahan & Pengendalian Penyakit (P2P)</option>
                                 <option value="Bidang Pelayanan Kesehatan (Yankes)">Bidang Pelayanan Kesehatan (Yankes)</option>
-                                <option value="Bidang Sumber Daya Kesehatan (SDK)">Bidang Sumber Daya Kesehatan (SDK)</option>
-                                <option value="Kepala Dinas & Pejabat Struktural">Kepala Dinas & Pejabat Struktural</option>
+                                <option value="Subbagian Umum & Kepegawaian">Subbagian Umum & Kepegawaian</option>
+                                <option value="Subbagian Program & Keuangan">Subbagian Program & Keuangan</option>
+                                <option value="Puskesmas">Puskesmas</option>
                             </select>
                         </div>
                         <div class="mb-3"><label class="form-label-bold">Keterangan</label><textarea id="editDescription" name="description" class="form-control" rows="3"></textarea></div>
                         
+                        <div class="wa-toggle-card mb-4">
+                            <div><div class="fw-bold text-danger"><i class="bi bi-whatsapp"></i> Kirim Notifikasi WhatsApp</div><div class="small text-secondary">Update pengingat ke peserta via WhatsApp</div></div>
+                            <div class="form-check form-switch"><input id="editWa" class="form-check-input fs-4" type="checkbox" name="is_whatsapp_notify" value="1"></div>
+                        </div>
+
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
                             <button type="submit" class="btn btn-warning text-white fw-bold">Update Booking</button>
@@ -381,12 +401,14 @@
                     var actionButtons = document.getElementById('actionButtons'); 
                     var notOwnerAlert = document.getElementById('notOwnerAlert');
                     var btnOpenEdit = document.getElementById('btnOpenEdit');
+                    var detailWaActive = document.getElementById('detailWaActive');
                     var formDelete = document.getElementById('formDelete');
 
                     // 1. RESET TAMPILAN
                     actionButtons.style.display = 'none'; 
                     notOwnerAlert.style.display = 'none'; 
                     notOwnerAlert.innerHTML = '';
+                    detailWaActive.style.display = 'none';
                     btnOpenEdit.onclick = null;
                     formDelete.action = "javascript:void(0);";
 
@@ -407,6 +429,11 @@
                     var end = event.end ? event.end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                     document.getElementById('detailTime').innerText = event.start.toLocaleDateString('id-ID', { dateStyle: 'full' }) + ' • ' + start + (end ? ' - ' + end : '');
                     
+                    // CEK STATUS WA
+                    if (props.is_whatsapp_notify == 1) {
+                        detailWaActive.style.display = 'flex';
+                    }
+
                     // 2. LOGIKA HAK AKSES
                     if (props.can_edit) {
                         actionButtons.style.display = 'flex'; 
@@ -442,6 +469,9 @@
                                 if(document.getElementById('editEnd')._flatpickr) document.getElementById('editEnd')._flatpickr.clear();
                             }
                             
+                            // SET TOGGLE WA DI FORM EDIT
+                            document.getElementById('editWa').checked = (props.is_whatsapp_notify == 1);
+
                             new bootstrap.Modal(document.getElementById('editModal')).show();
                         };
                     } else {

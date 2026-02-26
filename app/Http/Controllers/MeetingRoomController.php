@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agenda;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class MeetingRoomController extends Controller
 {
@@ -13,107 +13,136 @@ class MeetingRoomController extends Controller
         return view('meeting_room.index');
     }
 
-    public function store(Request $request)
+    public function feed(Request $request)
     {
-        // 1. Validasi
-        $request->validate([
-            'title' => 'required',
-            'date' => 'required|date',
-            'start_hour' => 'required',
-            'end_hour' => 'required',
-            'location' => 'required',
-        ]);
+        // Hanya ambil data bertipe 'meeting_room'
+        $events = Agenda::where('type', 'meeting_room')
+            ->get()
+            ->map(function ($agenda) {
+                return [
+                    'id' => $agenda->id,
+                    'title' => $agenda->title . ' (' . $agenda->location . ')', // Tampilkan Nama & Ruangan
+                    'start' => $agenda->start_time,
+                    'end' => $agenda->end_time,
+                    'extendedProps' => [
+                        'location' => $agenda->location,
+                        'description' => $agenda->description,
+                        'participants' => $agenda->participants, // Penting untuk Edit
+                        'is_whatsapp_notify' => $agenda->is_whatsapp_notify, // Penting untuk Edit
+                        'creator_name' => $agenda->creator->name ?? 'Unknown',
+                        'can_edit' => $agenda->user_id == auth()->id() || auth()->user()->role == 'super_admin'
+                    ],
+                    // Warna Oranye Khusus Booking Room
+                    'backgroundColor' => '#fff7ed', 
+                    'borderColor' => '#f97316',
+                    'textColor' => '#ea580c'
+                ];
+            });
 
-        $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
-        $end_datetime = $request->date . ' ' . $request->end_hour . ':00';
-
-        if ($end_datetime <= $start_datetime) {
-            return redirect()->back()->with('error', 'Jam selesai harus lebih akhir dari jam mulai.');
-        }
-
-        // 2. CEK BENTROK (Create)
-        $conflictingAgenda = Agenda::where('location', $request->location)
-            ->where(function ($query) use ($start_datetime, $end_datetime) {
-                $query->where('start_time', '<', $end_datetime)
-                      ->where('end_time', '>', $start_datetime);
-            })
-            ->first();
-
-        if ($conflictingAgenda) {
-            $booker = $conflictingAgenda->user ? $conflictingAgenda->user->name : 'Admin lain';
-            $jam = $conflictingAgenda->start_time->format('H:i') . ' - ' . ($conflictingAgenda->end_time ? $conflictingAgenda->end_time->format('H:i') : '?');
-            return redirect()->back()->with('error', "Gagal! Ruangan dipakai oleh {$booker} ({$jam}).");
-        }
-
-        // 3. Simpan
-        Agenda::create([
-            'user_id' => Auth::id(),
-            'type' => 'meeting_room',
-            'title' => $request->title,
-            'start_time' => $start_datetime,
-            'end_time' => $end_datetime,
-            'location' => $request->location,
-            'participants' => $request->participants ?? [],
-            'description' => $request->description,
-            'is_whatsapp_notify' => $request->has('is_whatsapp_notify') ? true : false,
-        ]);
-
-        return redirect()->back()->with('success', 'Booking berhasil dibuat!');
+        return response()->json($events);
     }
 
-    public function update(Request $request, string $id)
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'date' => 'required|date',
+            'start_hour' => 'required',
+            'location' => 'required|string', // Ini adalah Nama Ruangan
+            'participants' => 'nullable|array', // Tambahan Peserta
+        ]);
+
+        $start_time = Carbon::parse($request->date . ' ' . $request->start_hour);
+        $end_time = $request->end_hour ? Carbon::parse($request->date . ' ' . $request->end_hour) : $start_time->copy()->addHour();
+
+        // Cek Bentrok Ruangan
+        // Logic: Cari agenda lain di ruangan yang sama, yang waktunya beririsan
+        $conflict = Agenda::where('type', 'meeting_room')
+            ->where('location', $request->location) // Cek ruangan yang sama
+            ->where(function ($query) use ($start_time, $end_time) {
+                $query->whereBetween('start_time', [$start_time, $end_time])
+                      ->orWhereBetween('end_time', [$start_time, $end_time])
+                      ->orWhere(function ($q) use ($start_time, $end_time) {
+                          $q->where('start_time', '<=', $start_time)
+                            ->where('end_time', '>=', $end_time);
+                      });
+            })
+            ->exists();
+
+        if ($conflict) {
+            return back()->with('error', 'GAGAL BOOKING: Ruangan ' . $request->location . ' sudah terpakai di jam tersebut.');
+        }
+
+        Agenda::create([
+            'user_id' => auth()->id(),
+            'type' => 'meeting_room', // KUNCI UTAMA: Tipe Meeting Room
+            'title' => $request->title,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'location' => $request->location,
+            'description' => $request->description,
+            'participants' => $request->participants, // Simpan Peserta
+            'is_whatsapp_notify' => $request->has('is_whatsapp_notify'), // Simpan Status WA
+        ]);
+
+        return redirect()->route('meeting-room.index')->with('success', 'Booking ruangan berhasil dibuat & Notifikasi dijadwalkan.');
+    }
+
+    public function update(Request $request, $id)
     {
         $agenda = Agenda::findOrFail($id);
 
-        // --- UPDATE LOGIKA SECURITY (SUPER ADMIN) ---
-        // Jika User BUKAN Pemilik DAN User BUKAN Super Admin -> Tendang
-        if ($agenda->user_id != Auth::id() && Auth::user()->role !== 'super_admin') {
-            return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki izin untuk mengubah booking ini.');
-        }
-        // --------------------------------------------
-
-        // 2. Validasi
-        $request->validate([
-            'title' => 'required',
-            'date' => 'required|date',
-            'start_hour' => 'required',
-            'end_hour' => 'required',
-            'location' => 'required',
-        ]);
-
-        $start_datetime = $request->date . ' ' . $request->start_hour . ':00';
-        $end_datetime = $request->date . ' ' . $request->end_hour . ':00';
-
-        if ($end_datetime <= $start_datetime) {
-            return redirect()->back()->with('error', 'Jam selesai harus lebih akhir dari jam mulai.');
+        // Validasi Hak Akses
+        if ($agenda->user_id != auth()->id() && auth()->user()->role != 'super_admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // 3. CEK BENTROK (KECUALI DIRI SENDIRI)
-        $conflictingAgenda = Agenda::where('location', $request->location)
-            ->where('id', '!=', $id) // Abaikan data ini sendiri
-            ->where(function ($query) use ($start_datetime, $end_datetime) {
-                $query->where('start_time', '<', $end_datetime)
-                      ->where('end_time', '>', $start_datetime);
+        $start_time = Carbon::parse($request->date . ' ' . $request->start_hour);
+        $end_time = $request->end_hour ? Carbon::parse($request->date . ' ' . $request->end_hour) : $start_time->copy()->addHour();
+
+        // Cek Bentrok (Kecuali Punya Sendiri)
+        $conflict = Agenda::where('type', 'meeting_room')
+            ->where('id', '!=', $id) // Abaikan diri sendiri
+            ->where('location', $request->location)
+            ->where(function ($query) use ($start_time, $end_time) {
+                $query->whereBetween('start_time', [$start_time, $end_time])
+                      ->orWhereBetween('end_time', [$start_time, $end_time])
+                      ->orWhere(function ($q) use ($start_time, $end_time) {
+                          $q->where('start_time', '<=', $start_time)
+                            ->where('end_time', '>=', $end_time);
+                      });
             })
-            ->first();
+            ->exists();
 
-        if ($conflictingAgenda) {
-            $booker = $conflictingAgenda->user ? $conflictingAgenda->user->name : 'Admin lain';
-            $jam = $conflictingAgenda->start_time->format('H:i') . ' - ' . ($conflictingAgenda->end_time ? $conflictingAgenda->end_time->format('H:i') : '?');
-            return redirect()->back()->with('error', "Gagal Update! Ruangan bentrok dengan {$booker} ({$jam}).");
+        if ($conflict) {
+            return back()->with('error', 'UPDATE GAGAL: Jadwal baru bentrok dengan penggunaan ruangan lain.');
         }
 
-        // 4. Update Data
         $agenda->update([
             'title' => $request->title,
-            'start_time' => $start_datetime,
-            'end_time' => $end_datetime,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
             'location' => $request->location,
-            'participants' => $request->participants ?? [],
             'description' => $request->description,
-            // is_whatsapp_notify opsional, tidak diupdate disini agar simpel
+            'participants' => $request->participants, // Update Peserta
+            'is_whatsapp_notify' => $request->has('is_whatsapp_notify'), // Update WA
         ]);
 
-        return redirect()->back()->with('success', 'Jadwal berhasil diperbarui!');
+        // Jika user mencentang ulang WA, reset status terkirim agar dikirim lagi
+        if ($request->has('is_whatsapp_notify')) {
+            $agenda->update(['notification_sent' => false]);
+        }
+
+        return back()->with('success', 'Booking ruangan berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $agenda = Agenda::findOrFail($id);
+        if ($agenda->user_id != auth()->id() && auth()->user()->role != 'super_admin') {
+            return back()->with('error', 'Anda tidak berhak menghapus booking ini.');
+        }
+        $agenda->delete();
+        return back()->with('success', 'Booking ruangan dihapus.');
     }
 }
